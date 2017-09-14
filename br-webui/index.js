@@ -55,6 +55,10 @@ app.get('/camera', function(req, res) {
 	res.render('camera', {});
 });
 
+app.get('/dame', function(req, res) {
+	res.render('dame', {});
+});
+
 app.get('/network', function(req, res) {
 	res.render('network', {});
 });
