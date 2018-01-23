@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd /home/pi/
+cd /home/jack/
 tty.js --port 8088

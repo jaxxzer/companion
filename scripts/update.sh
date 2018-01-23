@@ -10,20 +10,20 @@ echo 'Please be patient and DO NOT REMOVE POWER FROM THE ROV!'
 sleep 10
 
 echo 'adding lock'
-touch /home/pi/.updating
+touch /home/jack/.updating
 
 
 if [ -z "$4" ]; then
     echo 'skipping backup...'
 else
     echo 'removing old backup'
-    rm -rf /home/pi/.companion
+    rm -rf /home/jack/.companion
 
     echo 'backup current repo'
-    cp -r /home/pi/companion /home/pi/.companion
+    cp -r /home/jack/companion /home/jack/.companion
 fi
 
-cd /home/pi/companion
+cd /home/jack/companion
 
 echo 'stashing local changes'
 git -c user.name="companion-update" -c user.email="companion-update" stash
@@ -47,4 +47,4 @@ else
 fi
 
 echo 'running post-update'
-/home/pi/companion/scripts/post-update.sh
+/home/jack/companion/scripts/post-update.sh

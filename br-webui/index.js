@@ -55,7 +55,7 @@ var _cameras = []
 var _activeFormat
 
 try {
-	var file_path = "/home/pi/vidformat.param";
+	var file_path = "/home/jack/vidformat.param";
 	var file_data = fs.readFileSync(file_path).toString();
 	var fields = file_data.split("\n");
 	_activeFormat = { "frameSize": fields[0] + "x" + fields[1], "frameRate": fields[2], "device": fields[3], "format": "H264" }
@@ -68,7 +68,7 @@ var _profiles = {};
 
 // Load saved user camera/streaming profiles
 try {
-	var file_path = "/home/pi/camera-profiles";
+	var file_path = "/home/jack/camera-profiles";
 	_profiles = JSON.parse(fs.readFileSync(file_path).toString());
 	logger.log("loading profiles from file", _profiles);
 } catch (err) {
@@ -77,7 +77,7 @@ try {
 
 //This holds all of the last used/known settings from previous run
 var old_cameras = []
-const camera_settings_path = "/home/pi/camera-settings"
+const camera_settings_path = "/home/jack/camera-settings"
 // Load the last known camera settings
 try {
 	var file_data = fs.readFileSync(camera_settings_path);
@@ -254,8 +254,8 @@ app.post('/test', function(req, res) {
 	}
 });
 
-app.get('/home/pi/server.php', function(req, res) {
-	return res.sendFile('/home/pi/server.php');
+app.get('/home/jack/server.php', function(req, res) {
+	return res.sendFile('/home/jack/server.php');
 });
 
 app.get('/git', function(req, res) {
@@ -816,7 +816,7 @@ io.on('connection', function(socket) {
 		});
 		
 		try {
-			var file_path = "/home/pi/vidformat.param";
+			var file_path = "/home/jack/vidformat.param";
 			var file_data = fs.readFileSync(file_path).toString();
 			var fields = file_data.split("\n");
 			
@@ -869,7 +869,7 @@ io.on('connection', function(socket) {
 		logger.log("Writing profiles to file", _profiles);
 
 		try {
-			file_path = "/home/pi/camera-profiles";
+			file_path = "/home/jack/camera-profiles";
 			fs.writeFileSync(file_path, JSON.stringify(_profiles, null, 2));
 		} catch (err) {
 			logger.log("Error writing profile to file");
@@ -888,7 +888,7 @@ io.on('connection', function(socket) {
 		logger.log("save v4l2 profile");
 		try {
 			// Load gstreamer settings to use in this profile
-			var file_path = "/home/pi/vidformat.param";
+			var file_path = "/home/jack/vidformat.param";
 			var file_data = fs.readFileSync(file_path).toString();
 			var fields = file_data.split("\n");
 	
@@ -911,7 +911,7 @@ io.on('connection', function(socket) {
 			
 			logger.log("Writing profiles to file", _profiles);
 			
-			file_path = "/home/pi/camera-profiles";
+			file_path = "/home/jack/camera-profiles";
 			fs.writeFileSync(file_path, JSON.stringify(_profiles, null, 2));
 		} catch (err) {
 			logger.log("Error writing profile to file");
@@ -1092,7 +1092,7 @@ io.on('connection', function(socket) {
 				try {
 					////// Update frontend //////
 					// Re-load file/activeFormat
-					var file_path = "/home/pi/vidformat.param";
+					var file_path = "/home/jack/vidformat.param";
 					var file_data = fs.readFileSync(file_path).toString();
 					var fields = file_data.split("\n");
 					
@@ -1191,7 +1191,7 @@ io.on('connection', function(socket) {
 				params = fs.readFileSync(_companion_directory + "/params/gstreamer2.param.default");
 			}
 			
-			var file_path = "/home/pi/gstreamer2.param";
+			var file_path = "/home/jack/gstreamer2.param";
 			fs.writeFileSync(file_path, params);
 			
 			var cmd = child_process.spawn(_companion_directory + '/scripts/start_video.sh', {
@@ -1415,7 +1415,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('save params', function(data) {
-		var file_path = "/home/pi/" + data.file
+		var file_path = "/home/jack/" + data.file
 		fs.writeFile(file_path, data.params, function(err) {
 			if(err) {
 				logger.log(err);
@@ -1433,7 +1433,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('load params', function(data) {
-		var user_file_path    = "/home/pi/" + data.file;
+		var user_file_path    = "/home/jack/" + data.file;
 		var default_file_path = _companion_directory + "/params/" +  data.file + ".default";
 		// Check if the user param file exists, use default file if it doesn't
 		fs.stat(user_file_path, function(err, stat) {
@@ -1454,7 +1454,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('delete params', function(data) {
-		var user_file_path    = "/home/pi/" + data.file;
+		var user_file_path    = "/home/jack/" + data.file;
 		// Check if the user param file exists, delete it if it does
 		fs.stat(user_file_path, function(err, stat) {
 			if (err == null) {
@@ -1615,7 +1615,7 @@ io.on('connection', function(socket) {
 	socket.on('set default ip', function(ip) {
 		logger.log("set default ip", ip);
 
-		child_process.exec('/home/pi/companion/scripts/set_default_client_ip.sh ' + ip, function (error, stdout, stderr) {
+		child_process.exec('/home/jack/companion/scripts/set_default_client_ip.sh ' + ip, function (error, stdout, stderr) {
 			logger.log(stdout + stderr);
 		});
 

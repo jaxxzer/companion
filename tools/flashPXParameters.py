@@ -95,4 +95,4 @@ time.sleep(4)
 
 # Start screen session with mavproxy
 print "Restarting mavproxy"
-os.system("screen -dm -S mavproxy /home/pi/companion/scripts/start_mavproxy_telem_splitter.sh")
+os.system("screen -dm -S mavproxy /home/jack/companion/scripts/start_mavproxy_telem_splitter.sh")

@@ -2,16 +2,16 @@
 
 # Bugfix for revert on first update. 0.0.7 had a bug in update.sh where the companion directory was not copied correctly (no -r option)
 # Do it the right way here so we can revert if
-cd /home/pi/companion
+cd /home/jack/companion
 WAS_0_0_7=$(git rev-list --count revert-point...0.0.7)
 if [ $WAS_0_0_7 == 0 ]; then
     echo '0.0.7 update, repairing fall-back...'
-    cp -r /home/pi/companion /home/pi/.companion
-    cd /home/pi/.companion
+    cp -r /home/jack/companion /home/jack/.companion
+    cd /home/jack/.companion
     git reset --hard 0.0.7
 fi
 
-cd /home/pi/companion/br-webui
+cd /home/jack/companion/br-webui
 
 if ! npm list nodegit 2>&1 | grep -q nodegit@0.18.3; then
     echo 'Fetching nodegit packages for raspberry pi...'
@@ -42,7 +42,7 @@ then
     sudo reboot
 fi
 
-cd /home/pi/companion
+cd /home/jack/companion
 
 echo 'Updating submodules...'
 git submodule init && git submodule sync
@@ -74,7 +74,7 @@ if [[ ! -z $MAVLINK_STATUS && ($MAVLINK_STATUS == '+' || $MAVLINK_STATUS == '-')
     fi
 
     echo 'Installing mavlink...'
-    cd /home/pi/companion/submodules/mavlink/pymavlink
+    cd /home/jack/companion/submodules/mavlink/pymavlink
     sudo python setup.py build install
     if [ $? -ne 0 ] # If mavlink installation update failed:
     then
@@ -88,7 +88,7 @@ else
     echo 'mavlink is up to date.'
 fi
 
-cd /home/pi/companion
+cd /home/jack/companion
 
 echo 'Checking MAVProxy status...'
 MAVPROXY_STATUS=$(git submodule status | grep MAVProxy | head -c 1)
@@ -105,7 +105,7 @@ if [[ ! -z $MAVPROXY_STATUS && ($MAVPROXY_STATUS == '+' || $MAVPROXY_STATUS == '
     fi
 
     echo 'Installing MAVProxy...'
-    cd /home/pi/companion/submodules/MAVProxy
+    cd /home/jack/companion/submodules/MAVProxy
     sudo python setup.py build install
     if [ $? -ne 0 ] # If MAVProxy installation update failed:
     then
@@ -180,11 +180,11 @@ else
 fi
 
 # copy default parameters if neccessary
-cd /home/pi/companion/params
+cd /home/jack/companion/params
 
 for default_param_file in *; do
     if [[ $default_param_file == *".param.default" ]]; then
-        param_file="/home/pi/"$(echo $default_param_file | sed "s/.default//")
+        param_file="/home/jack/"$(echo $default_param_file | sed "s/.default//")
         if [ ! -e "$param_file" ]; then
             cp $default_param_file $param_file
         fi
@@ -216,11 +216,11 @@ echo 'Update Complete, refresh your browser'
 
 sleep 0.1
 
-echo 'quit webui' >> /home/pi/.update_log
+echo 'quit webui' >> /home/jack/.update_log
 screen -X -S webui quit
 
-echo 'restart webui' >> /home/pi/.update_log
-sudo -H -u pi screen -dm -S webui /home/pi/companion/scripts/start_webui.sh
+echo 'restart webui' >> /home/jack/.update_log
+sudo -H -u pi screen -dm -S webui /home/jack/companion/scripts/start_webui.sh
 
-echo 'removing lock' >> /home/pi/.update_log
-rm -f /home/pi/.updating
+echo 'removing lock' >> /home/jack/.update_log
+rm -f /home/jack/.updating

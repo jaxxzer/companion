@@ -41,7 +41,7 @@ if [ $? != 0 ]; then
 fi
 
 # load gstreamer options
-gstOptions=$(tr '\n' ' ' < /home/pi/gstreamer2.param)
+gstOptions=$(tr '\n' ' ' < /home/jack/gstreamer2.param)
 
 # make sure framesize and framerate are supported
 
