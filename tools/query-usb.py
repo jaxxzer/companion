@@ -47,7 +47,21 @@ _DEVPATH = "/dev/serial/by-id/"
 
 
 def getUdevInfo(devicePath):
-    ret = subprocess.check_output(["udevadm", "info", devicePath], universal_newlines=True)
+    output = subprocess.check_output(["udevadm", "info", devicePath], universal_newlines=True)
+    fields = output.split('\n')
+    ret = {}
+    for field in fields:
+        field = field[3:]
+        # print(field)
+        kvPair = field.split('=')
+
+        if len(kvPair) > 1:
+            # print("hello", kvPair)
+            ret[kvPair[0]] = kvPair[1]
+
+            
+    print(ret)
+    print('\n\n\n\\n')
     return ret
 
 
