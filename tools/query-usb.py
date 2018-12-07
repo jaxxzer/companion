@@ -33,6 +33,9 @@ The json format is:
 import subprocess
 import argparse
 
+EXIT_OK = 0
+EXIT_ERROR = 1
+EXIT_NO_DEVICE = 2
 
 companionFamiliarDevices = {
     "26ac:0011": "Pixhawk 1 autopilot",
@@ -47,10 +50,7 @@ ret = {
     "devices":[]
 }
 
-print(ret)
-
 _DEVPATH = "/dev/serial/by-id/"
-
 
 def getUdevInfo(devicePath):
     output = subprocess.check_output(["udevadm", "info", devicePath], universal_newlines=True)
@@ -72,7 +72,11 @@ def getUdevInfo(devicePath):
 
 #TODO handle no serial devices plugged in
 
-output = subprocess.check_output(["ls", _DEVPATH], universal_newlines=True)
+try:
+    output = subprocess.check_output(["ls", _DEVPATH], universal_newlines=True)
+except Exception as e:
+    print("Error - no devices on specified path %s" % _DEVPATH)
+    exit(EXIT_NO_DEVICE)
 devices = output.split('\n')
 print(output)
 print(devices)
