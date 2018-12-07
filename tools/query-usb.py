@@ -37,6 +37,7 @@ EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_NO_DEVICE = 2
 
+debug = False
 companionFamiliarDevices = {
     "26ac:0011": "Pixhawk 1 autopilot",
     "26ac:0011": "Blue Robotics low light USB camera",
@@ -44,13 +45,17 @@ companionFamiliarDevices = {
 }
 
 # args: path/pattern: (video or serial)
-full = True
+full = False
 
 ret = {
     "devices":[]
 }
 
 _DEVPATH = "/dev/serial/by-id/"
+def debugPrint(dbg):
+    if not debug:
+        return
+    print(dbg)
 
 def getUdevInfo(devicePath):
     output = subprocess.check_output(["udevadm", "info", devicePath], universal_newlines=True)
@@ -58,7 +63,8 @@ def getUdevInfo(devicePath):
     ret = {}
     for field in fields:
         field = field[3:]
-        print(field)
+
+        debugPrint(field)
         kvPair = field.split('=')
 
         if len(kvPair) > 1:
@@ -66,8 +72,8 @@ def getUdevInfo(devicePath):
             ret[kvPair[0]] = kvPair[1]
 
             
-    print(ret)
-    print('\n\n\n\\n')
+    debugPrint(ret)
+    debugPrint('\n\n\n\\n')
     return ret
 
 #TODO handle no serial devices plugged in
@@ -78,20 +84,18 @@ except Exception as e:
     print("Error - no devices on specified path %s" % _DEVPATH)
     exit(EXIT_NO_DEVICE)
 devices = output.split('\n')
-print(output)
-print(devices)
+debugPrint(output)
+debugPrint(devices)
 #print(subprocess.check_output([checkDevicesCmd.split(' ')]))
 for device in devices:
     if not len(device):
         continue
     deviceInfo = {}
     deviceInfo["udev-info"] = getUdevInfo(_DEVPATH + device)
-    deviceInfo["companion-device"] = ''
+
+    #deviceInfo["companion-extra"] = ''
+
     ret["devices"].append(deviceInfo)
-
-
-
-
 
 print(ret)
 # print()
