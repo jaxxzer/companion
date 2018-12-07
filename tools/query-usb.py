@@ -34,6 +34,12 @@ import subprocess
 import argparse
 
 
+companionFamiliarDevices = {
+    "26ac:0011": "Pixhawk 1 autopilot",
+    "26ac:0011": "Blue Robotics low light USB camera",
+    "0403:6015": "FT231X USB UART"
+}
+
 # args: path/pattern: (video or serial)
 full = True
 
@@ -52,7 +58,7 @@ def getUdevInfo(devicePath):
     ret = {}
     for field in fields:
         field = field[3:]
-        # print(field)
+        print(field)
         kvPair = field.split('=')
 
         if len(kvPair) > 1:
@@ -64,6 +70,7 @@ def getUdevInfo(devicePath):
     print('\n\n\n\\n')
     return ret
 
+#TODO handle no serial devices plugged in
 
 output = subprocess.check_output(["ls", _DEVPATH], universal_newlines=True)
 devices = output.split('\n')
@@ -75,7 +82,12 @@ for device in devices:
         continue
     deviceInfo = {}
     deviceInfo["udev-info"] = getUdevInfo(_DEVPATH + device)
+    deviceInfo["companion-device"] = ''
     ret["devices"].append(deviceInfo)
+
+
+
+
 
 print(ret)
 # print()
