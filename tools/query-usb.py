@@ -34,6 +34,7 @@ import sys
 import subprocess
 import glob
 import argparse
+import json
 
 PARSER = argparse.ArgumentParser(description=__doc__)
 PARSER.add_argument('--pattern',
@@ -42,8 +43,13 @@ PARSER.add_argument('--pattern',
                     default="/dev/serial/by-id/*",
                     help="Path to search for usb devices."
                     )
+PARSER.add_argument('--indent',
+                    action="store",
+                    type=int,
+                    default=None,
+                    help="Indent level for json output formatting."
+                    )
 ARGS = PARSER.parse_args()
-
 
 # exit codes
 EXIT_OK = 0
@@ -51,6 +57,11 @@ EXIT_ERROR = 1
 EXIT_NO_DEVICE = 2
 
 debug = False
+def debugPrint(dbg):
+    if not debug:
+        return
+    print(dbg)
+
 companionFamiliarDevices = {
     "Pixhawk Autopilot":
     {
@@ -71,11 +82,6 @@ companionFamiliarDevices = {
 ret = {
     "devices":[]
 }
-
-def debugPrint(dbg):
-    if not debug:
-        return
-    print(dbg)
 
 def getUdevInfo(devicePath):
     try:
@@ -127,11 +133,11 @@ for device in devices:
                 if udevInfo[identifier] != companionFamiliarDevices[familiarDevice][identifier]:
                     break # all identifiers must match
             except Exception as e:
-                print("Exception", e, file=sys.stderr)
+                print("Exception %s" % e, file=sys.stderr)
                 print("error looking for identifier", file=sys.stderr)
             else:
                 deviceInfo["companion-device"] = familiarDevice
 
     ret["devices"].append(deviceInfo)
 
-print(ret)
+print(json.dumps(ret, indent=ARGS.indent))
