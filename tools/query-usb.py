@@ -44,7 +44,7 @@ companionFamiliarDevices = {
     "26ac:0011": "Blue Robotics low light USB camera",
     "0403:6015": "FT231X USB UART"
 }
-_DEVPATH = "/dev/serial/by-id/"
+_DEVPATH = "/dev/serial/by-id"
 
 # args: path/pattern: (video or serial)
 full = False
@@ -85,15 +85,18 @@ except Exception as e:
     print("Exception", e)
     print("Error - no devices on specified path %s" % _DEVPATH, file=sys.stderr)
     exit(EXIT_NO_DEVICE)
+
+
+# split output of ls by each newline, each file is presumed to be a udev device (ie /dev/serial/by-id or /dev/video*)
 devices = output.split('\n')
-debugPrint(output)
-debugPrint(devices)
-#print(subprocess.check_output([checkDevicesCmd.split(' ')]))
+
+# ie for each "filename" in list of filenames
+# ex for each device in /dev/serial/by-id/
 for device in devices:
     if not len(device):
         continue
     deviceInfo = {}
-    deviceInfo["udev-info"] = getUdevInfo(_DEVPATH + device)
+    deviceInfo["udev-info"] = getUdevInfo(_DEVPATH + '/' + device)
 
     #deviceInfo["companion-extra"] = ''
 
