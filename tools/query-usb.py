@@ -32,14 +32,14 @@ The json format is:
 # TODO we should move os to subprocess in companion
 import sys
 import subprocess
-import argparse
+import glob
 import argparse
 
 PARSER = argparse.ArgumentParser(description=__doc__)
 PARSER.add_argument('--pattern',
                     action="store",
                     type=str,
-                    default="/dev/serial/by-id",
+                    default="/dev/serial/by-id/*",
                     help="Path to search for usb devices."
                     )
 ARGS = PARSER.parse_args()
@@ -58,14 +58,15 @@ companionFamiliarDevices = {
     },
     "Pixhawk 1 Autopilot BOOTLOADER":
     {
-        "ID_SERIAL":"3D_Robotics_PX4_FMU_v2.x_0"
+        "ID_SERIAL":"asdf.x_0"
     },
     "Blue Robotics HD Low Light USB Camera":
     {
-        "ID_SERIAL":"3D_Robotics_PX4_FMU_v2.x_0"
+        "ID_SERIAL":"as.x_0"
     }
 }
-_DEVPATH = "/dev/serial/by-id"
+
+_DEVPATH = ARGS.pattern
 
 # args: path/pattern: (video or serial)
 full = False
@@ -80,75 +81,59 @@ def debugPrint(dbg):
     print(dbg)
 
 def getUdevInfo(devicePath):
-    output = subprocess.check_output(["udevadm", "info", devicePath], universal_newlines=True)
-    fields = output.split('\n')
+    try:
+        output = subprocess.check_output(["udevadm", "info", devicePath], universal_newlines=True)
+        fields = output.split('\n')
+    except Exception as e:
+        print("Exception", e, file=sys.stderr)
+        print("error getting udev information for %s" % devicePath, file=sys.stderr)
+        return {}
+
     ret = {}
+
+    # for each line "E: KEY=VALUE"
     for field in fields:
+        # remove the first three characters
         field = field[3:]
 
-        debugPrint(field)
         kvPair = field.split('=')
 
         if len(kvPair) > 1:
-            # print("hello", kvPair)
             ret[kvPair[0]] = kvPair[1]
 
-            
-    debugPrint(ret)
-    debugPrint('\n\n\n\\n')
     return ret
 
-#TODO handle no serial devices plugged in
-
-try:
-    output = subprocess.check_output(["ls", _DEVPATH], universal_newlines=True)
-except Exception as e:
-    print("Exception", e)
-    print("Error - no devices on specified path %s" % _DEVPATH, file=sys.stderr)
-    exit(EXIT_NO_DEVICE)
-
-
-# split output of ls by each newline, each file is presumed to be a udev device (ie /dev/serial/by-id or /dev/video*)
-devices = output.split('\n')
-
+devices = glob.glob(ARGS.pattern)
 # ie for each "filename" in list of filenames
 # ex for each device in /dev/serial/by-id/
 for device in devices:
+    # no match for input search pattern
     if not len(device):
         continue
-    deviceInfo = {}
-    deviceInfo["udev-info"] = getUdevInfo(_DEVPATH + '/' + device)
 
-    #deviceInfo["companion-extra"] = ''
+    deviceInfo = {}
+    udevInfo = getUdevInfo(device)
+
+    # nothing of interest
+    if not len(udevInfo):
+        continue
+
+    # udev attributes
+    deviceInfo["udev-info"] = udevInfo
+    
+    # search for known device attributes from list of known devices
+    for familiarDevice in companionFamiliarDevices:
+        # list of identifying udev attributes for this device
+        for identifier in companionFamiliarDevices[familiarDevice]:
+            try:
+                # see if this device has the attribute/value we are looking for
+                if udevInfo[identifier] == companionFamiliarDevices[familiarDevice][identifier]:
+                    deviceInfo["companion-device"] = familiarDevice
+                    break
+            except Exception as e:
+                print("Exception", e, file=sys.stderr)
+                print("error looking up identifier", file=sys.stderr)
 
     ret["devices"].append(deviceInfo)
 
 print(ret)
-# print()
-# subprocess.call(["udevadm info /dev/serial/by"])
-# devices = ret["devices"]
-# devices.append({"whatsup":134})
-# print(ret["devices"])
-
-# subprocess.call("udevadm info /dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00")
-# subprocess.call(["udevadm", "info", "/dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00"])
-
-
-# output = subprocess.check_output(["udevadm", "info", "/dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00"])
-# print(output)
-# asdf = output.split(b'\n')
-# print(asdf)
-
-# output = subprocess.check_output("udevadm info /dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00".split(' '))
-# print(output)
-# asdf = output.split(b'\n')
-# print(asdf)
-
-# output = subprocess.check_output("udevadm info /dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00 | grep ID_VENDOR_ID".split(' '))
-# print(output)
-# asdf = output.split(b'\n')
-# print(asdf)
-
-
-
-
