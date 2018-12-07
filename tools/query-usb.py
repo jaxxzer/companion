@@ -52,24 +52,21 @@ EXIT_NO_DEVICE = 2
 
 debug = False
 companionFamiliarDevices = {
-    "Pixhawk 1 Autopilot":
+    "Pixhawk Autopilot":
     {
         "ID_SERIAL":"3D_Robotics_PX4_FMU_v2.x_0"
     },
-    "Pixhawk 1 Autopilot BOOTLOADER":
+    "Pixhawk Autopilot (Bootloader)":
     {
-        "ID_SERIAL":"asdf.x_0"
+        "ID_MODEL": 'PX4_BL_FMU_v2.x',
+        "ID_SERIAL":"3D_Robotics_PX4_BL_FMU_v2.x_0"
     },
     "Blue Robotics HD Low Light USB Camera":
     {
-        "ID_SERIAL":"as.x_0"
+        "ID_VENDOR_ID":"05a3",
+        "ID_MODEL_ID":"9422"
     }
 }
-
-_DEVPATH = ARGS.pattern
-
-# args: path/pattern: (video or serial)
-full = False
 
 ret = {
     "devices":[]
@@ -127,12 +124,13 @@ for device in devices:
         for identifier in companionFamiliarDevices[familiarDevice]:
             try:
                 # see if this device has the attribute/value we are looking for
-                if udevInfo[identifier] == companionFamiliarDevices[familiarDevice][identifier]:
-                    deviceInfo["companion-device"] = familiarDevice
-                    break
+                if udevInfo[identifier] != companionFamiliarDevices[familiarDevice][identifier]:
+                    break # all identifiers must match
             except Exception as e:
                 print("Exception", e, file=sys.stderr)
-                print("error looking up identifier", file=sys.stderr)
+                print("error looking for identifier", file=sys.stderr)
+            else:
+                deviceInfo["companion-device"] = familiarDevice
 
     ret["devices"].append(deviceInfo)
 
