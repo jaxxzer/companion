@@ -51,17 +51,6 @@ PARSER.add_argument('--indent',
                     )
 ARGS = PARSER.parse_args()
 
-# exit codes
-EXIT_OK = 0
-EXIT_ERROR = 1
-EXIT_NO_DEVICE = 2
-
-debug = False
-def debugPrint(dbg):
-    if not debug:
-        return
-    print(dbg)
-
 companionFamiliarDevices = {
     "Pixhawk Autopilot":
     {
@@ -76,6 +65,11 @@ companionFamiliarDevices = {
     {
         "ID_VENDOR_ID":"05a3",
         "ID_MODEL_ID":"9422"
+    },
+    "Raspberry Pi Camera Module":
+    {
+        "ID_VENDOR_ID":"05a3",
+        "ID_MODEL_ID":"9422"
     }
 }
 
@@ -85,12 +79,18 @@ ret = {
 
 def getUdevInfo(devicePath):
     try:
-        output = subprocess.check_output(["udevadm", "info", devicePath], universal_newlines=True)
+        output = subprocess.check_output(
+            ["udevadm", "info", devicePath],
+            stderr = subprocess.DEVNULL,
+            universal_newlines=True)
+
         fields = output.split('\n')
-    except Exception as e:
-        print("Exception", e, file=sys.stderr)
-        print("error getting udev information for %s" % devicePath, file=sys.stderr)
-        return {}
+    except subprocess.CalledProcessError as e:
+        if e.returncode is 4:
+            print("no udevadm info for %s" % devicePath, file=sys.stderr)
+            return {}
+        else:
+            raise e
 
     ret = {}
 
@@ -106,7 +106,10 @@ def getUdevInfo(devicePath):
 
     return ret
 
+# get list of filesystem paths matching pattern
+# ie /dev/ttyACM* -> [ '/dev/ttyACM0', '/dev/ttyACM1' ]
 devices = glob.glob(ARGS.pattern)
+
 # ie for each "filename" in list of filenames
 # ex for each device in /dev/serial/by-id/
 for device in devices:
@@ -126,18 +129,21 @@ for device in devices:
     
     # search for known device attributes from list of known devices
     for familiarDevice in companionFamiliarDevices:
+        match = True
         # list of identifying udev attributes for this device
         for identifier in companionFamiliarDevices[familiarDevice]:
             try:
                 # see if this device has the attribute/value we are looking for
                 if udevInfo[identifier] != companionFamiliarDevices[familiarDevice][identifier]:
+                    match = False
                     break # all identifiers must match
-            except Exception as e:
-                print("Exception %s" % e, file=sys.stderr)
-                print("error looking for identifier", file=sys.stderr)
-            else:
-                deviceInfo["companion-device"] = familiarDevice
+            except KeyError as e:
+                match = False
+                break # all identifiers must match
+        if match:
+            deviceInfo["companion-device"] = familiarDevice
+            break # we know what device this is
 
     ret["devices"].append(deviceInfo)
 
-print(json.dumps(ret, indent=ARGS.indent))
+print(json.dumps(ret, indent = ARGS.indent))
