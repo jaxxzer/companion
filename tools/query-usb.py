@@ -44,6 +44,7 @@ companionFamiliarDevices = {
     "26ac:0011": "Blue Robotics low light USB camera",
     "0403:6015": "FT231X USB UART"
 }
+_DEVPATH = "/dev/serial/by-id/"
 
 # args: path/pattern: (video or serial)
 full = False
@@ -52,7 +53,6 @@ ret = {
     "devices":[]
 }
 
-_DEVPATH = "/dev/serial/by-id/"
 def debugPrint(dbg):
     if not debug:
         return
@@ -82,6 +82,7 @@ def getUdevInfo(devicePath):
 try:
     output = subprocess.check_output(["ls", _DEVPATH], universal_newlines=True)
 except Exception as e:
+    print("Exception", e)
     print("Error - no devices on specified path %s" % _DEVPATH, file=sys.stderr)
     exit(EXIT_NO_DEVICE)
 devices = output.split('\n')
