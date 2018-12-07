@@ -33,16 +33,37 @@ The json format is:
 import sys
 import subprocess
 import argparse
+import argparse
 
+PARSER = argparse.ArgumentParser(description=__doc__)
+PARSER.add_argument('--pattern',
+                    action="store",
+                    type=str,
+                    default="/dev/serial/by-id",
+                    help="Path to search for usb devices."
+                    )
+ARGS = PARSER.parse_args()
+
+
+# exit codes
 EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_NO_DEVICE = 2
 
 debug = False
 companionFamiliarDevices = {
-    "26ac:0011": "Pixhawk 1 autopilot",
-    "26ac:0011": "Blue Robotics low light USB camera",
-    "0403:6015": "FT231X USB UART"
+    "Pixhawk 1 Autopilot":
+    {
+        "ID_SERIAL":"3D_Robotics_PX4_FMU_v2.x_0"
+    },
+    "Pixhawk 1 Autopilot BOOTLOADER":
+    {
+        "ID_SERIAL":"3D_Robotics_PX4_FMU_v2.x_0"
+    },
+    "Blue Robotics HD Low Light USB Camera":
+    {
+        "ID_SERIAL":"3D_Robotics_PX4_FMU_v2.x_0"
+    }
 }
 _DEVPATH = "/dev/serial/by-id"
 
