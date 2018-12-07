@@ -1,0 +1,2 @@
+ls: cannot access '/dev/serial/by-id/': No such file or directory
+Error - no devices on specified path /dev/serial/by-id/

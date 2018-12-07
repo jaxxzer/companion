@@ -30,6 +30,7 @@ The json format is:
 '''
 
 # TODO we should move os to subprocess in companion
+import sys
 import subprocess
 import argparse
 
@@ -81,7 +82,7 @@ def getUdevInfo(devicePath):
 try:
     output = subprocess.check_output(["ls", _DEVPATH], universal_newlines=True)
 except Exception as e:
-    print("Error - no devices on specified path %s" % _DEVPATH)
+    print("Error - no devices on specified path %s" % _DEVPATH, file=sys.stderr)
     exit(EXIT_NO_DEVICE)
 devices = output.split('\n')
 debugPrint(output)
