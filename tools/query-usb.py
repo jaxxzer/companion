@@ -14,9 +14,7 @@ The json format is:
 {
     "devices":[
             {
-                "path":</dev path>
-                "serial-id":</by-id name>
-                "usb-desc":<usb vid/pid>
+                "path":<pattern match path>
                 "companion-device": <known/expected devices in companion>
                 "udev-info":{
                     <udev-attr>:<udev-value>,
@@ -35,6 +33,7 @@ import subprocess
 import glob
 import argparse
 import json
+from __future__ import print_function
 
 PARSER = argparse.ArgumentParser(description=__doc__)
 PARSER.add_argument('--pattern',
