@@ -1,0 +1,25 @@
+<script>
+
+    function query() {
+        console.log("query")
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/udevadm", true);
+        xhr.addEventListener("readystatechange", processUsb, true);
+        xhr.send();
+
+    }
+
+    function processUsb(usb) {
+        console.log("usb:", usb.target.response);
+        document.getElementById("responseText").innerHTML = usb.target.response;
+        for (device in usb.target.response.devices) {
+            console.log("companionDevice: ", device);
+        }
+    }
+
+    query()
+</script>
+
+<h1>USB response:</h1>
+<b id="companionDevices"></b>
+<b id="responseText"></b>
