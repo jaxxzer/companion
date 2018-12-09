@@ -28,12 +28,12 @@ The json format is:
 '''
 
 # TODO we should move os to subprocess in companion
+from __future__ import print_function
 import sys
 import subprocess
 import glob
 import argparse
 import json
-from __future__ import print_function
 
 PARSER = argparse.ArgumentParser(description=__doc__)
 PARSER.add_argument('--pattern',
