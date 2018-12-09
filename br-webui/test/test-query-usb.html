@@ -8,18 +8,35 @@
         xhr.send();
 
     }
-
-    function processUsb(usb) {
-        console.log("usb:", usb.target.response);
-        document.getElementById("responseText").innerHTML = usb.target.response;
-        for (device in usb.target.response.devices) {
-            console.log("companionDevice: ", device);
-        }
+    function helloFunc() {
+        console.log("helloFunc");
     }
 
-    query()
-</script>
+    function processUsb(usb) {
+        // usb.target refers to the XMLHttpRequest object ('xhr')
+        if (usb.target.readyState != 4) {
+            return;
+        }
+        var companionDevices = [];
+        usbInfo = JSON.parse(usb.target.response);
+        document.getElementById("responseText").innerHTML = usb.target.response;
+        
+        for (device in usbInfo.devices) {
+            deviceInfo = usbInfo.devices[device]
+            console.log("companionDevice: ", deviceInfo);
+            if (deviceInfo["companion-device"]) {
+                console.log(deviceInfo["companion-device"]);
+                companionDevices.push(deviceInfo["companion-device"]);
+            }
+        }
+        document.getElementById("companionDevices").innerHTML = companionDevices.toString();
+        document.getElementById("responseText").innerHTML = usb.target.response;
 
+    }
+    query()
+
+</script>
+<h1>Companion devices:</h1>
+<b id="companionDevices">fuck</b>
 <h1>USB response:</h1>
-<b id="companionDevices"></b>
 <b id="responseText"></b>
