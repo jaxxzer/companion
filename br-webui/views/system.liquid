@@ -262,20 +262,17 @@ socket.on('getmav', function(data) {
         "Video" : {
             "searchPattern":"/dev/video*",
             "queryCallback":handleVideoDevices,
-            "devices": [],
-            "companionDevices": []
+            "devices": {}
         },
         "Audio" : {
             "searchPattern":"/dev/snd/*",
             "queryCallback":handleAudioDevices,
-            "devices": [],
-            "companionDevices": []
+            "devices": {}
         },
         "Serial" : {
             "searchPattern":"/dev/serial/by-id/*",
             "queryCallback":handleSerialDevices,
-            "devices": [],
-            "companionDevices": []
+            "devices": {}
         }
     }
 
@@ -296,41 +293,28 @@ socket.on('getmav', function(data) {
 
     function handleResponse(deviceType, response) {
         console.log("got query response", deviceType, response);
-
-        var cDevices = [];
-        var devices = [];
-
-                // usb.target refers to the XMLHttpRequest object ('xhr')
+        // response.target refers to the XMLHttpRequest object ('xhr')
         // wait for readyState == 4 ~ "Done"
         if (response.target.readyState != 4) {
             return null;
         }
-        var newDevices = [];
+
         usbInfo = JSON.parse(response.target.response);
         
         for (device in usbInfo.devices) {
-            deviceInfo = usbInfo.devices[device]
-            var cDeviceString = "";
-            if (deviceInfo["companion-device"]) {
-                cDeviceString = " (" + deviceInfo["companion-device"] + ")";
-                if (deviceInfo["companion-device"] in cDevices === false) {
-                    cDevices.push(deviceInfo["companion-device"]);
-                }
-            }
-            if (deviceInfo["udev-info"]["ID_MODEL"]) {
-                if (deviceInfo["udev-info"]["ID_MODEL"] in devices === false) {
-                    devices.push(deviceInfo["udev-info"]["ID_MODEL"] + cDeviceString);
+            var deviceInfo = usbInfo.devices[device];
+            var modelInfo = deviceInfo["udev-info"]["ID_MODEL"];
+            var deviceList = companionDevices[deviceType].devices;
+
+            if (modelInfo) {
+                if (modelInfo in deviceList === false) {
+                    deviceList[modelInfo] = deviceInfo["companion-device"];
                 }
             }
         }
+        console.log("deviceList", deviceList);
 
-        if (!devices && !companionDevices) {
-            return;
-        }
-
-        companionDevices[deviceType].companionDevices = cDevices;
-        companionDevices[deviceType].devices = devices;
-        companionDevices[deviceType].response = response.target.response;
+        console.log("companionDevices", companionDevices);
         updateHtmlContent();
     }
 
