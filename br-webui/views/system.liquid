@@ -255,6 +255,8 @@ socket.on('getmav', function(data) {
 });
 </script>
 
+
+
 <script>
     var companionDevices =
     {
@@ -317,7 +319,6 @@ socket.on('getmav', function(data) {
                     deviceList[modelInfo] = deviceInfo["companion-device"];
                 }
             }
-
         }
 
         companionDevices[deviceType].devices = deviceList;
@@ -347,6 +348,9 @@ socket.on('getmav', function(data) {
                 ul.appendChild(li);
             }
 
+            if (!ul.hasChildNodes()) {
+                h.innerHTML += " None!";
+            }
             deviceContent.appendChild(h);
             deviceContent.appendChild(ul);
         }
