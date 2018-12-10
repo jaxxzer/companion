@@ -311,10 +311,14 @@ socket.on('getmav', function(data) {
         for (device in usbInfo.devices) {
             deviceInfo = usbInfo.devices[device]
             if (deviceInfo["companion-device"]) {
-                cDevices.push(deviceInfo["companion-device"]);
+                if (deviceInfo["companion-device"] in cDevices === false) {
+                    cDevices.push(deviceInfo["companion-device"]);
+                }
             }
             if (deviceInfo["udev-info"]["ID_MODEL"]) {
-                devices.push(deviceInfo["udev-info"]["ID_MODEL"]);
+                if (deviceInfo["udev-info"]["ID_MODEL"] in devices === false) {
+                    devices.push(deviceInfo["udev-info"]["ID_MODEL"]);
+                }
             }
         }
 
