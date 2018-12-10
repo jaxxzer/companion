@@ -64,13 +64,11 @@
         usbInfo = JSON.parse(result.target.response);
         for (device in usbInfo.devices) {
             deviceInfo = usbInfo.devices[device]
-            console.log("deviceInfo", deviceInfo);
-            if (deviceInfo["ID_V4L_PRODUCT"]) {
-                newDevices.push(deviceInfo["companion-device"]);
+            if (deviceInfo["udev-info"]["ID_MODEL"]) {
+                newDevices.push(deviceInfo["udev-info"]["ID_MODEL"]);
             }
         }
         return newDevices;
-
     }
 
     function handleResponse(deviceType, response) {
@@ -81,7 +79,6 @@
         if (!devices && !companionDevices) {
             return;
         }
-        // companionDevices[deviceType].companionDevices = cDevices;
         companionDevices[deviceType].companionDevices = cDevices;
         companionDevices[deviceType].devices = devices;
         companionDevices[deviceType].response = response.target.response;
@@ -96,20 +93,16 @@
             deviceContent.removeChild(deviceContent.lastChild);
         }
         for (deviceType in companionDevices) {
-            console.log("deviceTypeee", deviceType, companionDevices);
             var h = document.createElement("h1");
             h.innerHTML = deviceType + ":";
             var h4 = document.createElement("h4");
-            h4.innerHTML = companionDevices[deviceType]["response"];
+            h4.innerHTML = companionDevices[deviceType]["devices"];
 
             var b = document.createElement("b");
-            console.log(companionDevices[deviceType]);
             b.innerHTML = companionDevices[deviceType]["companionDevices"];
 
             deviceContent.appendChild(h);
             deviceContent.appendChild(h4);
-
-            console.log(deviceContent);
             deviceContent.appendChild(b);
         }
     }
@@ -126,12 +119,7 @@
 
     loaded();
 
-    // function handleResult(result) {
-    //     return function() { }
-    // }
-
     for (deviceType in companionDevices) {
-        console.log("setup", deviceType);
         queryUsb(companionDevices[deviceType].searchPattern, companionDevices[deviceType].queryCallback);
     }
 </script>
