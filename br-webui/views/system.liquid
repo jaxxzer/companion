@@ -305,7 +305,12 @@ socket.on('getmav', function(data) {
 
         for (device in usbInfo.devices) {
             var deviceInfo = usbInfo.devices[device];
+
             var modelInfo = deviceInfo["udev-info"]["ID_MODEL"];
+
+            if (!modelInfo) {
+                modelInfo = deviceInfo["udev-info"]["ID_V4L_PRODUCT"];
+            }
 
             if (modelInfo) {
                 if (modelInfo in deviceList === false) {
