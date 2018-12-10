@@ -53,27 +53,28 @@ ARGS = PARSER.parse_args()
 companionFamiliarDevices = {
     "Pixhawk Autopilot":
     {
-        "ID_SERIAL":"3D_Robotics_PX4_FMU_v2.x_0"
+        "ID_MODEL" : "PX4_FMU_v2.x",
+        "ID_SERIAL" : "3D_Robotics_PX4_FMU_v2.x_0"
     },
-    "Pixhawk Autopilot (Bootloader)":
+    "Pixhawk Autopilot Bootloader":
     {
-        "ID_MODEL": 'PX4_BL_FMU_v2.x',
-        "ID_SERIAL":"3D_Robotics_PX4_BL_FMU_v2.x_0"
+        "ID_MODEL" : 'PX4_BL_FMU_v2.x',
+        "ID_SERIAL" : "3D_Robotics_PX4_BL_FMU_v2.x_0"
     },
     "Blue Robotics HD Low Light USB Camera":
     {
-        "ID_VENDOR_ID":"05a3",
-        "ID_MODEL_ID":"9422"
+        "ID_VENDOR_ID" : "05a3",
+        "ID_MODEL_ID" : "9422"
     },
     "Raspberry Pi Camera Module":
     {
-        "ID_VENDOR_ID":"05a3",
-        "ID_MODEL_ID":"9422"
+        "ID_V4L_PRODUCT" : "mmal service 16.1",
+        "COLORD_KIND" : "camera"
     },
     "Logitech c920 Camera":
     {
-        "ID_MODEL_ID":"082d",
-        "ID_VENDOR_ID":"046d"
+        "ID_MODEL_ID" : "082d",
+        "ID_VENDOR_ID" : "046d"
     }
 }
 
