@@ -4,14 +4,19 @@
 
         "Video" : {
             "searchPattern":"/dev/video*",
+            "queryCallback":handleVideoDevices,
             "devices": []
         },
         "Audio" : {
             "searchPattern":"/dev/snd/*",
+            "queryCallback":handleAudioDevices,
+
             "devices": []
         },
         "Serial" : {
             "searchPattern":"/dev/serial/by-id/*",
+            "queryCallback":handleSerialDevices,
+
             "devices": []
         }
     }
@@ -22,7 +27,7 @@
 
     function queryUsb(pattern, callback) {
         var xhr = new XMLHttpRequest();
-        var query = "?query=" + pattern;
+        var query = "?pattern=" + pattern;
         console.log("query", query);
 
         xhr.open("GET", "/udevadm" + query, true);
@@ -37,16 +42,30 @@
         if (result.target.readyState != 4) {
             return;
         }
-        var companionDevices = [];
+        var newDevices = [];
         usbInfo = JSON.parse(result.target.response);
         
         for (device in usbInfo.devices) {
             deviceInfo = usbInfo.devices[device]
             if (deviceInfo["companion-device"]) {
-                companionDevices.push(deviceInfo["companion-device"]);
+                newDevices.push(deviceInfo["companion-device"]);
             }
         }
-        return companionDevices;
+        return newDevices;
+    }
+
+
+
+    function handleResponse(deviceType, response) {
+        console.log("got query response", deviceType, response);
+
+        var devices = companionDevicesInResult(response);
+        if (!devices) {
+            return;
+        }
+        console.log("devices", devices);
+        companionDevices[deviceType].devices = devices;
+        updateHtmlContent();
     }
 
     // TODO figure this out w simpler? css
@@ -54,27 +73,42 @@
         var deviceContent = document.getElementById("deviceContent");
         deviceContent.innerHtml = "";
         for (deviceType in companionDevices) {
+            console.log("deviceTypeee", deviceType);
             var h = document.createElement("h1");
-            h.innerHtml = deviceType + ":";
+            h.innerHTML = deviceType + ":";
             var b = document.createElement("b");
             b.innerHTML = companionDevices[deviceType]["devices"].toString();
             deviceContent.appendChild(h);
+
+            console.log(deviceContent);
             deviceContent.appendChild(b);
         }
     }
 
+    function handleSerialDevices(result) {
+        console.log("fuck");
+        handleResponse("Serial", result);
+    }
+    function handleVideoDevices(result) {
+        console.log("fuck2");
+
+        handleResponse("Video", result);
+    }
+    function handleAudioDevices(result) {
+        console.log("fuck3");
+
+        handleResponse("Audio", result);
+    }
     loaded();
+
+    // function handleResult(result) {
+    //     return function() { }
+    // }
 
     for (deviceType in companionDevices) {
         console.log("setup", deviceType);
-        queryUsb(companionDevices[deviceType].searchPattern, function(resp) {
-            console.log("got query response", deviceType);
-
-            devices = companionDevicesInResult(resp);
-            companionDevices[deviceType].devices = devices;
-            updateHtmlContent();
-        });
+        queryUsb(companionDevices[deviceType].searchPattern, companionDevices[deviceType].queryCallback);
     }
 </script>
 
-<div id=deviceContent></div>
+<div id="deviceContent"></div>
