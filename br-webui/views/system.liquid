@@ -309,21 +309,18 @@ socket.on('getmav', function(data) {
             var modelInfo = deviceInfo["udev-info"]["ID_MODEL"];
 
             if (!modelInfo) {
-                modelInfo = deviceInfo["udev-info"]["ID_V4L_PRODUCT"];
+                modelInfo = deviceInfo["udev-info"]["ID_V4L_PRODUCT"]; // pi camera does not have ID_MODEL
             }
 
             if (modelInfo) {
                 if (modelInfo in deviceList === false) {
                     deviceList[modelInfo] = deviceInfo["companion-device"];
-                    console.log("deviceInfoopoooooo", deviceInfo["companion-device"]);
                 }
             }
 
         }
 
         companionDevices[deviceType].devices = deviceList;
-        console.log("deviceList", deviceList);
-        console.log("companionDevices", companionDevices);
 
         updateHtmlContent();
     }
@@ -335,8 +332,8 @@ socket.on('getmav', function(data) {
             deviceContent.removeChild(deviceContent.lastChild);
         }
         for (deviceType in companionDevices) {
-            var h = document.createElement("h1");
-            h.innerHTML = deviceType + ":";
+            var h = document.createElement("h4");
+            h.innerHTML = deviceType + " Devices:";
 
             var ul = document.createElement("ul");
             for (device in companionDevices[deviceType]["devices"])
@@ -425,8 +422,8 @@ socket.on('getmav', function(data) {
                     <dt>pingproxy: </dt>
                                                 <dd id="pingproxy"></dd>
                                 </dl>
-            <div id="deviceContent">
-            </div>
+            <div id="serviceContent"></div>
+            <div id="deviceContent"></div>
             </div>
         </div>
     </div>
