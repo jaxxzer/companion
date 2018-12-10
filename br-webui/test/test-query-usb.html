@@ -5,19 +5,20 @@
         "Video" : {
             "searchPattern":"/dev/video*",
             "queryCallback":handleVideoDevices,
-            "devices": []
+            "devices": [],
+            "companionDevices": []
         },
         "Audio" : {
             "searchPattern":"/dev/snd/*",
             "queryCallback":handleAudioDevices,
-
-            "devices": []
+            "devices": [],
+            "companionDevices": []
         },
         "Serial" : {
             "searchPattern":"/dev/serial/by-id/*",
             "queryCallback":handleSerialDevices,
-
-            "devices": []
+            "devices": [],
+            "companionDevices": []
         }
     }
 
@@ -40,7 +41,7 @@
         // usb.target refers to the XMLHttpRequest object ('xhr')
         // wait for readyState == 4 ~ "Done"
         if (result.target.readyState != 4) {
-            return;
+            return null;
         }
         var newDevices = [];
         usbInfo = JSON.parse(result.target.response);
@@ -54,31 +55,59 @@
         return newDevices;
     }
 
+    function deviceNamesInResult(result) {
+        if (result.target.readyState != 4) {
+            return null;
+        }
 
+        var newDevices = [];
+        usbInfo = JSON.parse(result.target.response);
+        for (device in usbInfo.devices) {
+            deviceInfo = usbInfo.devices[device]
+            console.log("deviceInfo", deviceInfo);
+            if (deviceInfo["ID_V4L_PRODUCT"]) {
+                newDevices.push(deviceInfo["companion-device"]);
+            }
+        }
+        return newDevices;
+
+    }
 
     function handleResponse(deviceType, response) {
         console.log("got query response", deviceType, response);
 
-        var devices = companionDevicesInResult(response);
-        if (!devices) {
+        var cDevices = companionDevicesInResult(response);
+        var devices = deviceNamesInResult(response);
+        if (!devices && !companionDevices) {
             return;
         }
-        console.log("devices", devices);
+        // companionDevices[deviceType].companionDevices = cDevices;
+        companionDevices[deviceType].companionDevices = cDevices;
         companionDevices[deviceType].devices = devices;
+        companionDevices[deviceType].response = response.target.response;
         updateHtmlContent();
     }
 
     // TODO figure this out w simpler? css
     function updateHtmlContent() {
         var deviceContent = document.getElementById("deviceContent");
-        deviceContent.innerHtml = "";
+        //deviceContent.innerHtml = "";
+        while (deviceContent.hasChildNodes()) {
+            deviceContent.removeChild(deviceContent.lastChild);
+        }
         for (deviceType in companionDevices) {
-            console.log("deviceTypeee", deviceType);
+            console.log("deviceTypeee", deviceType, companionDevices);
             var h = document.createElement("h1");
             h.innerHTML = deviceType + ":";
+            var h4 = document.createElement("h4");
+            h4.innerHTML = companionDevices[deviceType]["response"];
+
             var b = document.createElement("b");
-            b.innerHTML = companionDevices[deviceType]["devices"].toString();
+            console.log(companionDevices[deviceType]);
+            b.innerHTML = companionDevices[deviceType]["companionDevices"];
+
             deviceContent.appendChild(h);
+            deviceContent.appendChild(h4);
 
             console.log(deviceContent);
             deviceContent.appendChild(b);
@@ -86,19 +115,15 @@
     }
 
     function handleSerialDevices(result) {
-        console.log("fuck");
         handleResponse("Serial", result);
     }
     function handleVideoDevices(result) {
-        console.log("fuck2");
-
         handleResponse("Video", result);
     }
     function handleAudioDevices(result) {
-        console.log("fuck3");
-
         handleResponse("Audio", result);
     }
+
     loaded();
 
     // function handleResult(result) {
