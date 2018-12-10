@@ -284,7 +284,7 @@ app.get("/udevadm", function(req, res) {
     }
     console.log("got request for query:" + req.query.pattern);
 
-	var result = child_process.execSync("python3 " + COMPANION_DIR + "/tools/query-usb.py --indent=2 " + pattern);
+	var result = child_process.execSync("python3 " + _companion_directory + "/tools/query-usb.py --indent=2 " + pattern);
     res.setHeader('Content-Type', 'application/json');
     res.send(result.toString());
 });
