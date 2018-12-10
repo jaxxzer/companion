@@ -361,6 +361,8 @@ socket.on('getmav', function(data) {
     for (deviceType in companionDevices) {
         queryUsb(companionDevices[deviceType].searchPattern, companionDevices[deviceType].queryCallback);
     }
+    
+    setInterval(query, 1000);
 </script>
 
 <h1>Software Status and Update</h1>
