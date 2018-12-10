@@ -309,6 +309,7 @@ socket.on('getmav', function(data) {
             if (modelInfo) {
                 if (modelInfo in deviceList === false) {
                     deviceList[modelInfo] = deviceInfo["companion-device"];
+                    console.log("deviceInfoopoooooo", deviceInfo["companion-device"]);
                 }
             }
         }
