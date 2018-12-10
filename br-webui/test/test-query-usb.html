@@ -37,48 +37,34 @@
         xhr.send();
     }
 
-    function companionDevicesInResult(result) {
-        // usb.target refers to the XMLHttpRequest object ('xhr')
+    function handleResponse(deviceType, response) {
+        console.log("got query response", deviceType, response);
+
+        var cDevices = [];
+        var devices = [];
+
+                // usb.target refers to the XMLHttpRequest object ('xhr')
         // wait for readyState == 4 ~ "Done"
-        if (result.target.readyState != 4) {
+        if (response.target.readyState != 4) {
             return null;
         }
         var newDevices = [];
-        usbInfo = JSON.parse(result.target.response);
+        usbInfo = JSON.parse(response.target.response);
         
         for (device in usbInfo.devices) {
             deviceInfo = usbInfo.devices[device]
             if (deviceInfo["companion-device"]) {
-                newDevices.push(deviceInfo["companion-device"]);
+                cDevices.push(deviceInfo["companion-device"]);
             }
-        }
-        return newDevices;
-    }
-
-    function deviceNamesInResult(result) {
-        if (result.target.readyState != 4) {
-            return null;
-        }
-
-        var newDevices = [];
-        usbInfo = JSON.parse(result.target.response);
-        for (device in usbInfo.devices) {
-            deviceInfo = usbInfo.devices[device]
             if (deviceInfo["udev-info"]["ID_MODEL"]) {
-                newDevices.push(deviceInfo["udev-info"]["ID_MODEL"]);
+                devices.push(deviceInfo["udev-info"]["ID_MODEL"]);
             }
         }
-        return newDevices;
-    }
 
-    function handleResponse(deviceType, response) {
-        console.log("got query response", deviceType, response);
-
-        var cDevices = companionDevicesInResult(response);
-        var devices = deviceNamesInResult(response);
         if (!devices && !companionDevices) {
             return;
         }
+
         companionDevices[deviceType].companionDevices = cDevices;
         companionDevices[deviceType].devices = devices;
         companionDevices[deviceType].response = response.target.response;
@@ -88,7 +74,6 @@
     // TODO figure this out w simpler? css
     function updateHtmlContent() {
         var deviceContent = document.getElementById("deviceContent");
-        //deviceContent.innerHtml = "";
         while (deviceContent.hasChildNodes()) {
             deviceContent.removeChild(deviceContent.lastChild);
         }
