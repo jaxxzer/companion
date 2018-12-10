@@ -16,6 +16,9 @@ The json format is:
     }
 }
 '''
+"[0-9]+\..*"
+
+
 
 import argparse
 import subprocess
@@ -29,10 +32,23 @@ PARSER.add_argument('--user',
                     )
 ARGS = PARSER.parse_args()
 
-return = {
+
+output = subprocess.check_output(["screen", "-ls"])
+
+
+#//>>> a = re.compile("[0-9]+\..*")
+#>>> a.findall(output)
+#['3873.fuck\t(12/10/2018 01:55:22 AM)\t(Detached)', '3814.hello\t(12/10/2018 01:55:06 AM)\t(Detached)']
+
+ret = {
     "user":ARGS.user,
     "screens":{}
-    }
 }
 
-print(return)
+i = 0
+
+for line in str(output):
+    print("line %d", i, line)
+    i += 1
+
+print(ret)

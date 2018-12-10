@@ -69,6 +69,11 @@ companionFamiliarDevices = {
     {
         "ID_VENDOR_ID":"05a3",
         "ID_MODEL_ID":"9422"
+    },
+    "Logitech c920 Camera":
+    {
+        "ID_MODEL_ID":"082d",
+        "ID_VENDOR_ID":"046d"
     }
 }
 

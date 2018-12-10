@@ -253,7 +253,117 @@ socket.on('getmav', function(data) {
 	document.getElementById('driver').innerHTML = data.driver;
 	document.getElementById('pingproxy').innerHTML = data.pingproxy;
 });
+</script>
 
+<script>
+    var companionDevices =
+    {
+
+        "Video" : {
+            "searchPattern":"/dev/video*",
+            "queryCallback":handleVideoDevices,
+            "devices": [],
+            "companionDevices": []
+        },
+        "Audio" : {
+            "searchPattern":"/dev/snd/*",
+            "queryCallback":handleAudioDevices,
+            "devices": [],
+            "companionDevices": []
+        },
+        "Serial" : {
+            "searchPattern":"/dev/serial/by-id/*",
+            "queryCallback":handleSerialDevices,
+            "devices": [],
+            "companionDevices": []
+        }
+    }
+
+    function loaded() {
+        console.log("*~!~*~!~*~!~query-usb-loaded~!~*~!~*~!~*");
+    }
+
+    function queryUsb(pattern, callback) {
+        var xhr = new XMLHttpRequest();
+        var query = "?pattern=" + pattern;
+        console.log("query", query);
+
+        xhr.open("GET", "/udevadm" + query, true);
+
+        xhr.addEventListener("readystatechange", callback, true);
+        xhr.send();
+    }
+
+    function handleResponse(deviceType, response) {
+        console.log("got query response", deviceType, response);
+
+        var cDevices = [];
+        var devices = [];
+
+                // usb.target refers to the XMLHttpRequest object ('xhr')
+        // wait for readyState == 4 ~ "Done"
+        if (response.target.readyState != 4) {
+            return null;
+        }
+        var newDevices = [];
+        usbInfo = JSON.parse(response.target.response);
+        
+        for (device in usbInfo.devices) {
+            deviceInfo = usbInfo.devices[device]
+            if (deviceInfo["companion-device"]) {
+                cDevices.push(deviceInfo["companion-device"]);
+            }
+            if (deviceInfo["udev-info"]["ID_MODEL"]) {
+                devices.push(deviceInfo["udev-info"]["ID_MODEL"]);
+            }
+        }
+
+        if (!devices && !companionDevices) {
+            return;
+        }
+
+        companionDevices[deviceType].companionDevices = cDevices;
+        companionDevices[deviceType].devices = devices;
+        companionDevices[deviceType].response = response.target.response;
+        updateHtmlContent();
+    }
+
+    // TODO figure this out w simpler? css
+    function updateHtmlContent() {
+        var deviceContent = document.getElementById("deviceContent");
+        while (deviceContent.hasChildNodes()) {
+            deviceContent.removeChild(deviceContent.lastChild);
+        }
+        for (deviceType in companionDevices) {
+            var h = document.createElement("h1");
+            h.innerHTML = deviceType + ":";
+            var h4 = document.createElement("h4");
+            h4.innerHTML = companionDevices[deviceType]["devices"];
+
+            var b = document.createElement("b");
+            b.innerHTML = companionDevices[deviceType]["companionDevices"];
+
+            deviceContent.appendChild(h);
+            deviceContent.appendChild(h4);
+            deviceContent.appendChild(b);
+        }
+    }
+
+    function handleSerialDevices(result) {
+        handleResponse("Serial", result);
+    }
+    function handleVideoDevices(result) {
+        handleResponse("Video", result);
+    }
+    function handleAudioDevices(result) {
+        handleResponse("Audio", result);
+    }
+
+    loaded();
+
+    for (deviceType in companionDevices) {
+        queryUsb(companionDevices[deviceType].searchPattern, companionDevices[deviceType].queryCallback);
+    }
 </script>
 
 <h1>Software Status and Update</h1>
@@ -302,6 +412,8 @@ socket.on('getmav', function(data) {
 					<dt>pingproxy: </dt>
                                                 <dd id="pingproxy"></dd>
                                 </dl>
+			<div id="deviceContent">
+			</div>
 			</div>
 		</div>
 	</div>

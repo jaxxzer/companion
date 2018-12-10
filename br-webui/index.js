@@ -277,6 +277,19 @@ app.get('/network.min.js', (req, res, next) => {
 	return res.sendFile(__dirname + '/node_modules/network-js/dist/network.min.js');
 });
 
+app.get("/udevadm", function(req, res) {
+    var pattern = "";
+    if (req.query.pattern) {
+        pattern = "--pattern=" + req.query.pattern;
+    }
+    console.log("got request for query:" + req.query.pattern);
+
+	var result = child_process.execSync("python3 " + COMPANION_DIR + "/tools/query-usb.py --indent=2 " + pattern);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(result.toString());
+});
+
+
 var server = app.listen(2770, function() {
 	var host = server.address().address;
 	var port = server.address().port;
