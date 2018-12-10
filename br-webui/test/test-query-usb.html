@@ -1,42 +1,80 @@
 <script>
+    var companionDevices =
+    {
 
-    function query() {
-        console.log("query")
+        "Video" : {
+            "searchPattern":"/dev/video*",
+            "devices": []
+        },
+        "Audio" : {
+            "searchPattern":"/dev/snd/*",
+            "devices": []
+        },
+        "Serial" : {
+            "searchPattern":"/dev/serial/by-id/*",
+            "devices": []
+        }
+    }
+
+    function loaded() {
+        console.log("*~!~*~!~*~!~query-usb-loaded~!~*~!~*~!~*");
+    }
+
+    function queryUsb(pattern, callback) {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "/udevadm", true);
-        xhr.addEventListener("readystatechange", processUsb, true);
+        var query = "?query=" + pattern;
+        console.log("query", query);
+
+        xhr.open("GET", "/udevadm" + query, true);
+
+        xhr.addEventListener("readystatechange", callback, true);
         xhr.send();
-
-    }
-    function helloFunc() {
-        console.log("helloFunc");
     }
 
-    function processUsb(usb) {
+    function companionDevicesInResult(result) {
         // usb.target refers to the XMLHttpRequest object ('xhr')
-        if (usb.target.readyState != 4) {
+        // wait for readyState == 4 ~ "Done"
+        if (result.target.readyState != 4) {
             return;
         }
         var companionDevices = [];
-        usbInfo = JSON.parse(usb.target.response);
-        document.getElementById("responseText").innerHTML = usb.target.response;
+        usbInfo = JSON.parse(result.target.response);
         
         for (device in usbInfo.devices) {
             deviceInfo = usbInfo.devices[device]
-            console.log("companionDevice: ", deviceInfo);
             if (deviceInfo["companion-device"]) {
-                console.log(deviceInfo["companion-device"]);
                 companionDevices.push(deviceInfo["companion-device"]);
             }
         }
-        document.getElementById("companionDevices").innerHTML = companionDevices.toString();
-        document.getElementById("responseText").innerHTML = usb.target.response;
-
+        return companionDevices;
     }
-    query()
 
+    // TODO figure this out w simpler? css
+    function updateHtmlContent() {
+        var deviceContent = document.getElementById("deviceContent");
+        deviceContent.innerHtml = "";
+        for (deviceType in companionDevices) {
+            var h = document.createElement("h1");
+            h.innerHtml = deviceType + ":";
+            var b = document.createElement("b");
+            b.innerHTML = companionDevices[deviceType]["devices"].toString();
+            deviceContent.appendChild(h);
+            deviceContent.appendChild(b);
+        }
+    }
+
+    loaded();
+
+    for (deviceType in companionDevices) {
+        console.log("setup", deviceType);
+        queryUsb(companionDevices[deviceType].searchPattern, function(resp) {
+            console.log("got query response", deviceType);
+
+            devices = companionDevicesInResult(resp);
+            companionDevices[deviceType].devices = devices;
+            updateHtmlContent();
+        });
+    }
 </script>
-<h1>Companion devices:</h1>
-<b id="companionDevices">fuck</b>
-<h1>USB response:</h1>
-<b id="responseText"></b>
+
+<div id=deviceContent></div>
