@@ -301,10 +301,11 @@ socket.on('getmav', function(data) {
 
         usbInfo = JSON.parse(response.target.response);
         
+        var deviceList = {};
+
         for (device in usbInfo.devices) {
             var deviceInfo = usbInfo.devices[device];
             var modelInfo = deviceInfo["udev-info"]["ID_MODEL"];
-            var deviceList = companionDevices[deviceType].devices;
 
             if (modelInfo) {
                 if (modelInfo in deviceList === false) {
@@ -312,10 +313,13 @@ socket.on('getmav', function(data) {
                     console.log("deviceInfoopoooooo", deviceInfo["companion-device"]);
                 }
             }
-        }
-        console.log("deviceList", deviceList);
 
+        }
+
+        companionDevices[deviceType].devices = deviceList;
+        console.log("deviceList", deviceList);
         console.log("companionDevices", companionDevices);
+
         updateHtmlContent();
     }
 
@@ -361,14 +365,13 @@ socket.on('getmav', function(data) {
     function queryAllDeviceTypes() {
 
         for (deviceType in companionDevices) {
-            companoinDevices[deviceType].devices = {}
             queryUsb(companionDevices[deviceType].searchPattern, companionDevices[deviceType].queryCallback);
         }
     }
 
     queryAllDeviceTypes();
 
-    setInterval(queryAllDeviceTypes, 1000);
+    setInterval(queryAllDeviceTypes, 3000);
 </script>
 
 <h1>Software Status and Update</h1>
