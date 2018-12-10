@@ -12,19 +12,20 @@ The json format is:
     "user":<username>,
     "screens": [
         {
-        <screen-id>:<screen-name>,
-        ... 
-        }
+        "idNum":<id number>,
+        "idName":<id name>,
+        "time":<time>,
+        "state":<state>
+        },
+        ...
     ]
 }
 '''
-"[0-9]+\..*"
-
-
 
 import argparse
 import subprocess
 import re
+import json
 
 PARSER = argparse.ArgumentParser(description=__doc__)
 PARSER.add_argument('--user',
@@ -33,32 +34,23 @@ PARSER.add_argument('--user',
                     default="root",
                     help="User to check for running screen processes."
                     )
+PARSER.add_argument('--indent',
+                    action="store",
+                    type=int,
+                    default=None,
+                    help="Indent level for json output formatting."
+                    )
 ARGS = PARSER.parse_args()
 
-
-output = subprocess.check_output(["screen", "-ls"], universal_newlines=True)
-regex = re.compile("[0-9]+\..*")
-lines = regex.findall(output)
-
-
-
-#//>>> a = re.compile("[0-9]+\..*")
-#>>> a.findall(output)
-#['3873.fuck\t(12/10/2018 01:55:22 AM)\t(Detached)', '3814.hello\t(12/10/2018 01:55:06 AM)\t(Detached)']
-
 ret = {
-    "user":ARGS.user,
-    "screens":[]
+    "user" : ARGS.user,
+    "screens" : []
 }
 
-i = 0
-
 def processScreenOutputLine(line):
-    print(line)
     ret = {}
 
     fields = line.split('\t')
-    print(fields)
     id = fields[0].split('.', 1)
     ret["idNum"] = id[0]
     ret["idName"] = id[1]
@@ -67,11 +59,14 @@ def processScreenOutputLine(line):
     
     return ret
 
+try:
+    output = subprocess.check_output(["sudo", "-u" + ARGS.user, "screen", "-ls"], universal_newlines=True)
+    regex = re.compile("[0-9]+\..*")
+    lines = regex.findall(output)
+    for line in lines:
+        ret["screens"].append(processScreenOutputLine(line))
+except subprocess.CalledProcessError as e:
+    if e.returncode is 1:
+        pass
 
-
-
-for line in lines:
-    print(processScreenOutputLine(line))
-    ret["screens"].append(processScreenOutputLine(line))
-
-print(ret)
+print(json.dumps(ret, indent = ARGS.indent))

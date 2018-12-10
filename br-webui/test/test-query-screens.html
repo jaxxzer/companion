@@ -1,0 +1,65 @@
+<script>
+    var companionScreens = {
+        "root" : [],
+        "jack" : []
+    }
+    function loaded() {
+        console.log("*~!~*~!~*~!~query-screens-loaded~!~*~!~*~!~*");
+    }
+
+    function queryScreens(user, callback) {
+        var xhr = new XMLHttpRequest();
+        var query = "?user=" + user;
+        console.log("query", query);
+
+        xhr.open("GET", "/screens" + query, true);
+
+        xhr.addEventListener("readystatechange", callback, true);
+        xhr.send();
+    }
+
+    function handleResponse(deviceType, response) {
+        if (response.target.readyState != 4) {
+            return null;
+        }
+        console.log("got query response", deviceType, response);
+
+        jsonReply = JSON.parse(response.target.response);
+        
+        companionScreens[jsonReply.user] = jsonReply.screens
+
+        updateHtmlContent();
+    }
+
+    // TODO figure this out w simpler? css
+    function updateHtmlContent() {
+        var screensContent = document.getElementById("screensContent");
+        while (screensContent.hasChildNodes()) {
+            screensContent.removeChild(screensContent.lastChild);
+        }
+        for (user in companionScreens) {
+            var h = document.createElement("h3");
+            h.innerHTML = user + ":";
+            var ul = document.createElement("ul");
+            for (screen in companionScreens[user])
+            {
+                var li = document.createElement("li");
+
+                li.innerHTML = companionScreens[user][screen]["idName"] + " (" + companionScreens[user][screen]["idNum"] + ")";
+                ul.appendChild(li);
+            }
+            screensContent.appendChild(h);
+            screensContent.appendChild(ul);
+        }
+    }
+
+    loaded();
+
+    for (let user in companionScreens) {
+        queryScreens(user, function (res) {
+            return handleResponse(user, res);
+        });
+    }
+</script>
+
+<div id="screensContent"></div>
