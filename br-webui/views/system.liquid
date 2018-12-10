@@ -278,10 +278,6 @@ socket.on('getmav', function(data) {
         }
     }
 
-    function loaded() {
-        console.log("*~!~*~!~*~!~query-usb-loaded~!~*~!~*~!~*");
-    }
-
     function queryUsb(pattern, callback) {
         var xhr = new XMLHttpRequest();
         var query = "?pattern=" + pattern;
@@ -351,6 +347,7 @@ socket.on('getmav', function(data) {
             if (!ul.hasChildNodes()) {
                 h.innerHTML += " None!";
             }
+
             deviceContent.appendChild(h);
             deviceContent.appendChild(ul);
         }
@@ -359,14 +356,14 @@ socket.on('getmav', function(data) {
     function handleSerialDevices(result) {
         handleResponse("Serial", result);
     }
+
     function handleVideoDevices(result) {
         handleResponse("Video", result);
     }
+
     function handleAudioDevices(result) {
         handleResponse("Audio", result);
     }
-
-    loaded();
 
     function queryAllDeviceTypes() {
 

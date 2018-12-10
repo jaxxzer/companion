@@ -10,10 +10,12 @@ for a given user.
 The json format is:
 {
     "user":<username>,
-    "screens": {
+    "screens": [
+        {
         <screen-id>:<screen-name>,
         ... 
-    }
+        }
+    ]
 }
 '''
 "[0-9]+\..*"
@@ -22,6 +24,7 @@ The json format is:
 
 import argparse
 import subprocess
+import re
 
 PARSER = argparse.ArgumentParser(description=__doc__)
 PARSER.add_argument('--user',
@@ -33,7 +36,10 @@ PARSER.add_argument('--user',
 ARGS = PARSER.parse_args()
 
 
-output = subprocess.check_output(["screen", "-ls"])
+output = subprocess.check_output(["screen", "-ls"], universal_newlines=True)
+regex = re.compile("[0-9]+\..*")
+lines = regex.findall(output)
+
 
 
 #//>>> a = re.compile("[0-9]+\..*")
@@ -42,13 +48,30 @@ output = subprocess.check_output(["screen", "-ls"])
 
 ret = {
     "user":ARGS.user,
-    "screens":{}
+    "screens":[]
 }
 
 i = 0
 
-for line in str(output):
-    print("line %d", i, line)
-    i += 1
+def processScreenOutputLine(line):
+    print(line)
+    ret = {}
+
+    fields = line.split('\t')
+    print(fields)
+    id = fields[0].split('.', 1)
+    ret["idNum"] = id[0]
+    ret["idName"] = id[1]
+    ret["time"] = fields[1]
+    ret["state"] = fields[2]
+    
+    return ret
+
+
+
+
+for line in lines:
+    print(processScreenOutputLine(line))
+    ret["screens"].append(processScreenOutputLine(line))
 
 print(ret)
