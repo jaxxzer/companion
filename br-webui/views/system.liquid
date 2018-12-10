@@ -308,7 +308,7 @@ socket.on('getmav', function(data) {
 
             if (modelInfo) {
                 if (modelInfo in deviceList === false) {
-                    deviceList[modelInfo] = deviceInfo["companion-device"];
+                    deviceList[modelInfo] = deviceInfo["companion-device"] ? deviceInfo["companion-device"] : "";
                 }
             }
         }
@@ -332,7 +332,7 @@ socket.on('getmav', function(data) {
             for (device in companionDevices[deviceType]["devices"])
             {
                 var li = document.createElement("li");
-                li.innerHTML = companionDevices[deviceType]["devices"][device];
+                li.innerHTML = device + " (" + companionDevices[deviceType]["devices"][device] + ")";
                 ul.appendChild(li);
             }
 
