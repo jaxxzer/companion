@@ -377,7 +377,63 @@ socket.on('getmav', function(data) {
     setInterval(queryAllDeviceTypes, 3000);
 </script>
 
+<script>
+    var companionScreens = {
+        "pi" : []
+    }
 
+    function queryScreens(user, callback) {
+        var xhr = new XMLHttpRequest();
+        var query = "?user=" + user;
+        console.log("query", query);
+
+        xhr.open("GET", "/screen" + query, true);
+
+        xhr.addEventListener("readystatechange", callback, true);
+        xhr.send();
+    }
+
+    function handleResponse(deviceType, response) {
+        if (response.target.readyState != 4) {
+            return null;
+        }
+        console.log("got query response", deviceType, response);
+
+        jsonReply = JSON.parse(response.target.response);
+        
+        companionScreens[jsonReply.user] = jsonReply.screens
+
+        updateHtmlContent();
+    }
+
+    // TODO figure this out w simpler? css
+    function updateHtmlContent() {
+        var screenContent = document.getElementById("screenContent");
+        while (screenContent.hasChildNodes()) {
+            screenContent.removeChild(screenContent.lastChild);
+        }
+        for (user in companionScreens) {
+            var h = document.createElement("h3");
+            h.innerHTML = user + ":";
+            var ul = document.createElement("ul");
+            for (screen in companionScreens[user])
+            {
+                var li = document.createElement("li");
+
+                li.innerHTML = companionScreens[user][screen]["idName"] + " (" + companionScreens[user][screen]["idNum"] + ")";
+                ul.appendChild(li);
+            }
+            screenContent.appendChild(h);
+            screenContent.appendChild(ul);
+        }
+    }
+
+    for (let user in companionScreens) {
+        queryScreens(user, function (res) {
+            return handleResponse(user, res);
+        });
+    }
+</script>
 
 <h1>Software Status and Update</h1>
 <!-- Companion Computer Status -->
