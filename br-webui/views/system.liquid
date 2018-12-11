@@ -420,11 +420,17 @@ socket.on('getmav', function(data) {
         }
     }
 
-    for (let user in companionScreens) {
-        queryScreens(user, function (response) {
-            handleScreensResponse(user, response);
-        });
+    function queryAllScreens() {
+        for (let user in companionScreens) {
+            queryScreens(user, function (response) {
+                handleScreensResponse(user, response);
+            });
+        }
     }
+
+    queryAllScreens();
+
+    setInterval(queryAllScreens, 3000);
 </script>
 
 <h1>Software Status and Update</h1>

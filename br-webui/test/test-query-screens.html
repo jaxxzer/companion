@@ -51,11 +51,17 @@
         }
     }
 
-    for (let user in companionScreens) {
-        queryScreens(user, function (response) {
-            handleScreensResponse(user, response);
-        });
+    function queryAllScreens() {
+        for (let user in companionScreens) {
+            queryScreens(user, function (response) {
+                handleScreensResponse(user, response);
+            });
+        }
     }
+
+    queryAllScreens();
+
+    setInterval(queryAllScreens, 3000);
 </script>
 
 <div id="screenContent"></div>
