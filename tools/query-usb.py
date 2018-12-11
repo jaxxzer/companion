@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 
 '''
-Print a json with information about screens that are running for a given user.
-Most of the services offered by Blue Robotics companion are run as background
-command line processes. These commands/services are running under detached 
-screens. This program will return a json describing the screen ids and names
-for a given user.
+Print a json with information about usb/udev devices. The devices are selected using
+an input --pattern. This program will return a json describing the usb devices according 
+to the command `udevadm info <device>`. Information is collected for each udev device 
+matching the input pattern.
 
-See also (or similar):
-`udevadm info /dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00 | sed -n 's/E: //p'`
+ex. `python3 query-usb.py --pattern=/dev/video*`
+`python3 query-usb.py --pattern=/dev/disk/by-id/* --indent=2`
+
+The patterns are matched according to the python glob module. This only provides support 
+for simple unix style patterns.
+
+See also, for example, (or similar):
+`udevadm info /dev/sda | sed -n 's/E: //p'`
 
 The json format is:
 {
@@ -27,15 +32,15 @@ The json format is:
 }
 '''
 
-# TODO we should move os to subprocess in companion
-from __future__ import print_function
+# TODO should we generally move os to subprocess in companion?
+# TODO python2 support
 import sys
 import subprocess
 import glob
 import argparse
 import json
 
-PARSER = argparse.ArgumentParser(description=__doc__)
+PARSER = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
 PARSER.add_argument('--pattern',
                     action="store",
                     type=str,
@@ -86,8 +91,8 @@ def getUdevInfo(devicePath):
     try:
         output = subprocess.check_output(
             ["udevadm", "info", devicePath],
-            stderr = subprocess.DEVNULL,
-            universal_newlines=True)
+            stderr = subprocess.DEVNULL, # don't print stderr in output
+            universal_newlines=True) # needed for the output to be a string?
 
         fields = output.split('\n')
     except subprocess.CalledProcessError as e:
@@ -101,7 +106,7 @@ def getUdevInfo(devicePath):
 
     # for each line "E: KEY=VALUE"
     for field in fields:
-        # remove the first three characters
+        # remove the first three characters, "E: "
         field = field[3:]
 
         kvPair = field.split('=')
@@ -129,6 +134,9 @@ for device in devices:
     if not len(udevInfo):
         continue
 
+    # the path matching the input pattern for this device
+    deviceInfo["path"] = device
+
     # udev attributes
     deviceInfo["udev-info"] = udevInfo
     
@@ -146,8 +154,8 @@ for device in devices:
                 match = False
                 break # all identifiers must match
         if match:
-            deviceInfo["companion-device"] = familiarDevice
-            break # we know what device this is
+            deviceInfo["companion-device"] = familiarDevice # all identifiers match, we know this device
+            break # we know what device this is, we don't need to check any further
 
     ret["devices"].append(deviceInfo)
 

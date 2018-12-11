@@ -14,12 +14,44 @@ The json format is:
         {
         "idNum":<id number>,
         "idName":<id name>,
-        "time":<time>,
         "state":<state>
         },
         ...
     ]
 }
+
+To create a detached screen, use `-dm`:
+`screen -dm`
+
+To create a named screen, use `-S`:
+`screen -dm -S <screenName>`
+ex `screen -dm -S hello`
+
+To list the currently running screen sessions, use:
+`screen -ls`
+
+To list the currently running screen sessions of a particular ie different user, use:
+`sudo -u <username> screen -ls`
+ex `sudo -u $(whoami) screen -ls`
+
+To attach to a detached screen, refer to the screen using the id number or the name.
+`screen -r <screenId|screenName>`
+ex `screen -r hello`
+
+In an attached screen session, you may press `<ctrl + a>`, then `:` to enter 'command mode'.
+
+To detach from an attached screen session, enter command mode, and press `<d>` to detach.
+To scroll in an attached screen session, enter command mode, and press `<esc>`.
+Then, you may scroll. To resume following the most recent output, press `<esc>` again.
+
+To issue a command on a detached screen, use `-X` and the command you want to enter, `quit`:
+`screen -S <screenName> -X <command>`
+ex `screen -S hello -X quit`
+
+To exit (terminate) an attached screen session, enter command mode, and type `quit`, 
+then press `<enter>`.
+
+See `man screen` for more information.
 '''
 
 import argparse
@@ -27,7 +59,7 @@ import subprocess
 import re
 import json
 
-PARSER = argparse.ArgumentParser(description=__doc__)
+PARSER = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
 PARSER.add_argument('--user',
                     action="store",
                     type=str,
@@ -47,6 +79,11 @@ ret = {
     "screens" : []
 }
 
+# process line of interest (regex match) from output of `screen -ls` command
+# ex:
+# $ screen -ls
+# There are screens on:
+#     3669.hello      (Detached)
 def processScreenOutputLine(line):
     ret = {}
 
@@ -54,14 +91,15 @@ def processScreenOutputLine(line):
     id = fields[0].split('.', 1)
     ret["idNum"] = id[0]
     ret["idName"] = id[1]
-    ret["time"] = fields[1]
-    ret["state"] = fields[2]
+    ret["state"] = fields[-1]
     
     return ret
 
 try:
     # -A exits w error instead of asking password
     output = subprocess.check_output(["sudo", "-Au" + ARGS.user, "screen", "-ls"], universal_newlines=True)
+
+    # match 1~many digits, followed by one dot '.' character, then whatever follows until we hit a newline
     regex = re.compile("[0-9]+\..*")
     lines = regex.findall(output)
     for line in lines:
