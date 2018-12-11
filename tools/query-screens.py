@@ -95,17 +95,20 @@ def processScreenOutputLine(line):
     
     return ret
 
+output = ""
 try:
     # -A exits w error instead of asking password
     output = subprocess.check_output(["sudo", "-Au" + ARGS.user, "screen", "-ls"], universal_newlines=True)
 
+except subprocess.CalledProcessError as e:
+    if e.returncode is 1:
+        output = e.output # screen v4.2.x always gives exit code of 1 for 'screen -ls'
+
+finally:
     # match 1~many digits, followed by one dot '.' character, then whatever follows until we hit a newline
     regex = re.compile("[0-9]+\..*")
     lines = regex.findall(output)
     for line in lines:
         ret["screens"].append(processScreenOutputLine(line))
-except subprocess.CalledProcessError as e:
-    if e.returncode is 1:
-        pass
 
 print(json.dumps(ret, indent = ARGS.indent))
