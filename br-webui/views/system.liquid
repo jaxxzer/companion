@@ -329,12 +329,12 @@ socket.on('getmav', function(data) {
             deviceContent.removeChild(deviceContent.lastChild);
         }
 
-        var sectionHeading = document.createElement("h2");
+        var sectionHeading = document.createElement("h3");
         sectionHeading.innerHTML = "Detected Devices:";
         deviceContent.appendChild(sectionHeading);
 
         for (deviceType in companionDevices) {
-            var h = document.createElement("h4");
+            var h = document.createElement("h5");
             h.innerHTML = deviceType + " Devices:";
 
             var ul = document.createElement("ul");
@@ -373,7 +373,6 @@ socket.on('getmav', function(data) {
 
 <script>
    var companionScreens = {
-        "root" : [],
         "pi" : []
     }
 
@@ -416,7 +415,8 @@ socket.on('getmav', function(data) {
             {
                 var li = document.createElement("li");
 
-                li.innerHTML = companionScreens[user][screen]["idName"] + " (" + companionScreens[user][screen]["idNum"] + ")";
+                li.innerHTML = companionScreens[user][screen]["idName"];
+
                 ul.appendChild(li);
             }
             screenContent.appendChild(h);
