@@ -279,16 +279,31 @@ app.get('/network.min.js', (req, res, next) => {
 
 app.get("/udevadm", function(req, res) {
     var pattern = "";
+
     if (req.query.pattern) {
         pattern = "--pattern=" + req.query.pattern;
     }
-    console.log("got request for query:" + req.query.pattern);
 
-	var result = child_process.execSync("python3 " + _companion_directory + "/tools/query-usb.py --indent=2 " + pattern);
+    logger.log("got request for udevadm query:" + req.query.pattern);
+
+    var result = child_process.execSync("python3 " + _companion_directory + "/tools/query-usb.py --indent=2 " + pattern);
     res.setHeader('Content-Type', 'application/json');
     res.send(result.toString());
 });
 
+app.get("/screen", function(req, res) {
+    var user = "";
+
+    if (req.query.user) {
+        user = "--user=" + req.query.user;
+    }
+
+    logger.log("got request for screens on user:" + req.query.user);
+    
+    var result = child_process.execSync("python3 " + _companion_directory + "/tools/query-screens.py --indent=2 " + user);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(result.toString());
+});
 
 var server = app.listen(2770, function() {
 	var host = server.address().address;

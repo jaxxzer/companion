@@ -15,7 +15,7 @@ app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname + "/test-query-screens.html"));
 });
 
-app.get("/screens", function(req, res) {
+app.get("/screen", function(req, res) {
     var user = "";
     if (req.query.user) {
         user = "--user=" + req.query.user;

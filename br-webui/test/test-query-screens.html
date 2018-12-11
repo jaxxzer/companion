@@ -13,7 +13,7 @@
         var query = "?user=" + user;
         console.log("query", query);
 
-        xhr.open("GET", "/screens" + query, true);
+        xhr.open("GET", "/screen" + query, true);
 
         xhr.addEventListener("readystatechange", callback, true);
         xhr.send();
@@ -34,9 +34,9 @@
 
     // TODO figure this out w simpler? css
     function updateHtmlContent() {
-        var screensContent = document.getElementById("screensContent");
-        while (screensContent.hasChildNodes()) {
-            screensContent.removeChild(screensContent.lastChild);
+        var screenContent = document.getElementById("screenContent");
+        while (screenContent.hasChildNodes()) {
+            screenContent.removeChild(screenContent.lastChild);
         }
         for (user in companionScreens) {
             var h = document.createElement("h3");
@@ -49,8 +49,8 @@
                 li.innerHTML = companionScreens[user][screen]["idName"] + " (" + companionScreens[user][screen]["idNum"] + ")";
                 ul.appendChild(li);
             }
-            screensContent.appendChild(h);
-            screensContent.appendChild(ul);
+            screenContent.appendChild(h);
+            screenContent.appendChild(ul);
         }
     }
 
@@ -63,4 +63,4 @@
     }
 </script>
 
-<div id="screensContent"></div>
+<div id="screenContent"></div>

@@ -25,7 +25,7 @@ To create a detached screen, use `-dm`:
 
 To create a named screen, use `-S`:
 `screen -dm -S <screenName>`
-ex `screen -dm -S hello`
+ex `screen -dm -S myScreen`
 
 To list the currently running screen sessions, use:
 `screen -ls`
@@ -36,7 +36,7 @@ ex `sudo -u $(whoami) screen -ls`
 
 To attach to a detached screen, refer to the screen using the id number or the name.
 `screen -r <screenId|screenName>`
-ex `screen -r hello`
+ex `screen -r myScreen`
 
 In an attached screen session, you may press `<ctrl + a>`, then `:` to enter 'command mode'.
 
@@ -46,7 +46,7 @@ Then, you may scroll. To resume following the most recent output, press `<esc>` 
 
 To issue a command on a detached screen, use `-X` and the command you want to enter, `quit`:
 `screen -S <screenName> -X <command>`
-ex `screen -S hello -X quit`
+ex `screen -S myScreen -X quit`
 
 To exit (terminate) an attached screen session, enter command mode, and type `quit`, 
 then press `<enter>`.
@@ -83,7 +83,7 @@ ret = {
 # ex:
 # $ screen -ls
 # There are screens on:
-#     3669.hello      (Detached)
+#     3669.myScreen      (Detached)
 def processScreenOutputLine(line):
     ret = {}
 
