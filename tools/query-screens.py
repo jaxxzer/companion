@@ -60,7 +60,8 @@ def processScreenOutputLine(line):
     return ret
 
 try:
-    output = subprocess.check_output(["sudo", "-u" + ARGS.user, "screen", "-ls"], universal_newlines=True)
+    # -A exits w error instead of asking password
+    output = subprocess.check_output(["sudo", "-Au" + ARGS.user, "screen", "-ls"], universal_newlines=True)
     regex = re.compile("[0-9]+\..*")
     lines = regex.findall(output)
     for line in lines:
