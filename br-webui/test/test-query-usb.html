@@ -4,29 +4,19 @@
 
         "Video" : {
             "searchPattern":"/dev/video*",
-            "queryCallback":handleVideoDevices,
-            "devices": [],
-            "companionDevices": []
+            "devices": {}
         },
         "Audio" : {
             "searchPattern":"/dev/snd/*",
-            "queryCallback":handleAudioDevices,
-            "devices": [],
-            "companionDevices": []
+            "devices": {}
         },
         "Serial" : {
             "searchPattern":"/dev/serial/by-id/*",
-            "queryCallback":handleSerialDevices,
-            "devices": [],
-            "companionDevices": []
+            "devices": {}
         }
     }
 
-    function loaded() {
-        console.log("*~!~*~!~*~!~query-usb-loaded~!~*~!~*~!~*");
-    }
-
-    function queryUsb(pattern, callback) {
+    function queryUdevadm(pattern, callback) {
         var xhr = new XMLHttpRequest();
         var query = "?pattern=" + pattern;
         console.log("query", query);
@@ -37,76 +27,84 @@
         xhr.send();
     }
 
-    function handleResponse(deviceType, response) {
+    function handleUdevadmResponse(deviceType, response) {
         console.log("got query response", deviceType, response);
-
-        var cDevices = [];
-        var devices = [];
-
-                // usb.target refers to the XMLHttpRequest object ('xhr')
+        // response.target refers to the XMLHttpRequest object ('xhr')
         // wait for readyState == 4 ~ "Done"
         if (response.target.readyState != 4) {
             return null;
         }
-        var newDevices = [];
+
         usbInfo = JSON.parse(response.target.response);
         
+        var deviceList = {};
+
         for (device in usbInfo.devices) {
-            deviceInfo = usbInfo.devices[device]
-            if (deviceInfo["companion-device"]) {
-                cDevices.push(deviceInfo["companion-device"]);
+            var deviceInfo = usbInfo.devices[device];
+
+            var modelInfo = deviceInfo["udev-info"]["ID_MODEL"];
+
+            if (!modelInfo) {
+                modelInfo = deviceInfo["udev-info"]["ID_V4L_PRODUCT"]; // pi camera does not have ID_MODEL
             }
-            if (deviceInfo["udev-info"]["ID_MODEL"]) {
-                devices.push(deviceInfo["udev-info"]["ID_MODEL"]);
+
+            if (modelInfo) {
+                if (modelInfo in deviceList === false) {
+                    deviceList[modelInfo] = deviceInfo["companion-device"];
+                }
             }
         }
 
-        if (!devices && !companionDevices) {
-            return;
-        }
+        companionDevices[deviceType].devices = deviceList;
 
-        companionDevices[deviceType].companionDevices = cDevices;
-        companionDevices[deviceType].devices = devices;
-        companionDevices[deviceType].response = response.target.response;
-        updateHtmlContent();
+        updateDeviceContent();
     }
 
     // TODO figure this out w simpler? css
-    function updateHtmlContent() {
+    function updateDeviceContent() {
         var deviceContent = document.getElementById("deviceContent");
+
+        // clear existing content
         while (deviceContent.hasChildNodes()) {
             deviceContent.removeChild(deviceContent.lastChild);
         }
+        
         for (deviceType in companionDevices) {
-            var h = document.createElement("h1");
-            h.innerHTML = deviceType + ":";
-            var h4 = document.createElement("h4");
-            h4.innerHTML = companionDevices[deviceType]["devices"];
+            var h = document.createElement("h4");
+            h.innerHTML = deviceType + " Devices:";
 
-            var b = document.createElement("b");
-            b.innerHTML = companionDevices[deviceType]["companionDevices"];
+            var ul = document.createElement("ul");
+            for (device in companionDevices[deviceType]["devices"])
+            {
+                var li = document.createElement("li");
+                var companionString = "";
+                if (companionDevices[deviceType]["devices"][device]) {
+                    companionString = " (" + companionDevices[deviceType]["devices"][device] + ")";
+                }
+                li.innerHTML = device + companionString;
+                ul.appendChild(li);
+            }
+
+            if (!ul.hasChildNodes()) {
+                h.innerHTML += " None!";
+            }
 
             deviceContent.appendChild(h);
-            deviceContent.appendChild(h4);
-            deviceContent.appendChild(b);
+            deviceContent.appendChild(ul);
         }
     }
 
-    function handleSerialDevices(result) {
-        handleResponse("Serial", result);
-    }
-    function handleVideoDevices(result) {
-        handleResponse("Video", result);
-    }
-    function handleAudioDevices(result) {
-        handleResponse("Audio", result);
+    function queryAllDeviceTypes() {
+        for (let deviceType in companionDevices) {
+            queryUdevadm(companionDevices[deviceType].searchPattern, function(response) {
+                handleUdevadmResponse(deviceType, response);
+            });
+        }
     }
 
-    loaded();
+    queryAllDeviceTypes();
 
-    for (deviceType in companionDevices) {
-        queryUsb(companionDevices[deviceType].searchPattern, companionDevices[deviceType].queryCallback);
-    }
+    setInterval(queryAllDeviceTypes, 3000);
 </script>
 
 <div id="deviceContent"></div>
