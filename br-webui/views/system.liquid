@@ -287,12 +287,13 @@ socket.on('getmav', function(data) {
     }
 
     function handleUdevadmResponse(deviceType, response) {
-        console.log("got udevadm query response", deviceType, response);
         // response.target refers to the XMLHttpRequest object ('xhr')
         // wait for readyState == 4 ~ "Done"
         if (response.target.readyState != 4) {
             return null;
         }
+
+        console.log("got udevadm query response", deviceType, response);
 
         usbInfo = JSON.parse(response.target.response);
         
