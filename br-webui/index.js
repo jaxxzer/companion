@@ -277,6 +277,34 @@ app.get('/network.min.js', (req, res, next) => {
 	return res.sendFile(__dirname + '/node_modules/network-js/dist/network.min.js');
 });
 
+app.get("/udevadm", function(req, res) {
+    var pattern = "";
+
+    if (req.query.pattern) {
+        pattern = "--pattern=" + req.query.pattern;
+    }
+
+    logger.log("got request for udevadm query:" + req.query.pattern);
+
+    var result = child_process.execSync("python3 " + _companion_directory + "/tools/query-udevadm.py --indent=2 " + pattern);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(result.toString());
+});
+
+app.get("/screen", function(req, res) {
+    var user = "";
+
+    if (req.query.user) {
+        user = "--user=" + req.query.user;
+    }
+
+    logger.log("got request for screens on user:" + req.query.user);
+
+    var result = child_process.execSync("python3 " + _companion_directory + "/tools/query-screen.py --indent=2 " + user);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(result.toString());
+});
+
 var server = app.listen(2770, function() {
 	var host = server.address().address;
 	var port = server.address().port;
