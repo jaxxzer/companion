@@ -20,8 +20,8 @@ The json format is:
     "devices":[
             {
                 "path":<pattern match path>
-                "companion-device": <known/expected devices in companion>
-                "udev-info":{
+                "companionDevice": <known/expected devices in companion>
+                "udevInfo":{
                     <udev-attr>:<udev-value>,
                     ...
                 }
@@ -138,7 +138,7 @@ for device in devices:
     deviceInfo["path"] = device
 
     # udev attributes
-    deviceInfo["udev-info"] = udevInfo
+    deviceInfo["udevInfo"] = udevInfo
     
     # search for known device attributes from list of known devices
     for familiarDevice in companionFamiliarDevices:
@@ -154,7 +154,7 @@ for device in devices:
                 match = False
                 break # all identifiers must match
         if match:
-            deviceInfo["companion-device"] = familiarDevice # all identifiers match, we know this device
+            deviceInfo["companionDevice"] = familiarDevice # all identifiers match, we know this device
             break # we know what device this is, we don't need to check any further
 
     ret["devices"].append(deviceInfo)

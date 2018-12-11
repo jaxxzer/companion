@@ -1,11 +1,7 @@
 <script>
-    var companionScreens = {
+   var companionScreens = {
         "root" : [],
         "pi" : []
-    }
-    
-    function loaded() {
-        console.log("*~!~*~!~*~!~query-screens-loaded~!~*~!~*~!~*");
     }
 
     function queryScreens(user, callback) {
@@ -19,21 +15,22 @@
         xhr.send();
     }
 
-    function handleResponse(deviceType, response) {
+    function handleScreensResponse(user, response) {
         if (response.target.readyState != 4) {
             return null;
         }
-        console.log("got query response", deviceType, response);
+
+        console.log("got screens query response", user, response);
 
         jsonReply = JSON.parse(response.target.response);
         
         companionScreens[jsonReply.user] = jsonReply.screens
 
-        updateHtmlContent();
+        updateScreensContent();
     }
 
     // TODO figure this out w simpler? css
-    function updateHtmlContent() {
+    function updateScreensContent() {
         var screenContent = document.getElementById("screenContent");
         while (screenContent.hasChildNodes()) {
             screenContent.removeChild(screenContent.lastChild);
@@ -54,11 +51,9 @@
         }
     }
 
-    loaded();
-
     for (let user in companionScreens) {
-        queryScreens(user, function (res) {
-            return handleResponse(user, res);
+        queryScreens(user, function (response) {
+            handleScreensResponse(user, response);
         });
     }
 </script>

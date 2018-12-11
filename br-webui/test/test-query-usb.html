@@ -42,15 +42,15 @@
         for (device in usbInfo.devices) {
             var deviceInfo = usbInfo.devices[device];
 
-            var modelInfo = deviceInfo["udev-info"]["ID_MODEL"];
+            var modelInfo = deviceInfo["udevInfo"]["ID_MODEL"];
 
             if (!modelInfo) {
-                modelInfo = deviceInfo["udev-info"]["ID_V4L_PRODUCT"]; // pi camera does not have ID_MODEL
+                modelInfo = deviceInfo["udevInfo"]["ID_V4L_PRODUCT"]; // pi camera does not have ID_MODEL
             }
 
             if (modelInfo) {
                 if (modelInfo in deviceList === false) {
-                    deviceList[modelInfo] = deviceInfo["companion-device"];
+                    deviceList[modelInfo] = deviceInfo["companionDevice"];
                 }
             }
         }
@@ -68,7 +68,7 @@
         while (deviceContent.hasChildNodes()) {
             deviceContent.removeChild(deviceContent.lastChild);
         }
-        
+
         for (deviceType in companionDevices) {
             var h = document.createElement("h4");
             h.innerHTML = deviceType + " Devices:";
