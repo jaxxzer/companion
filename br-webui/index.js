@@ -57,14 +57,28 @@ var _cameras = []
 //so we don't do that in this application.
 var _activeFormat
 
-try {
-	var file_path = home_dir+"/vidformat.param";
-	var file_data = fs.readFileSync(file_path).toString();
-	var fields = file_data.split("\n");
-	_activeFormat = { "frameSize": fields[0] + "x" + fields[1], "frameRate": fields[2], "device": fields[3], "format": "H264" }
-} catch (err) {
-	logger.log("error loading video format from file", err);
+function readConfigFile(configFile, defaultFile) {
+	try {
+		var file_data = fs.readFileSync(configFile)
+	} catch (err) {
+		logger.warn("error loading video format from file", err);
+		logger.warn("copying default video format file");
+		child_process.execSync("cp " + defaultFile + " " + configFile);
+		try {
+			var file_data = fs.readFileSync(configFile)
+			return file_data;
+		} catch (err) {
+			logger.error("error loading default video format file", err);
+		}
+	}
 }
+
+var defaultVideoConfigPath = companion_dir + "/params/vidformat.param.default";
+var videoConfigPath = home_dir + "/vidformat.param";
+var file_data = readConfigFile(videoConfigPath, defaultVideoConfigPath);
+var fields = file_data.split("\n");
+_activeFormat = { "frameSize": fields[0] + "x" + fields[1], "frameRate": fields[2], "device": fields[3], "format": "H264" }
+
 
 // This holds the user created camera/streaming profiles
 var _profiles = {};
