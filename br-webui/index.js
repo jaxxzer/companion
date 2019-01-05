@@ -73,7 +73,7 @@ function readConfigFile(configFile, defaultFile) {
 	}
 }
 
-var defaultVideoConfigPath = _companion_dir + "/params/vidformat.param.default";
+var defaultVideoConfigPath = _companion_directory + "/params/vidformat.param.default";
 var videoConfigPath = home_dir + "/vidformat.param";
 var file_data = readConfigFile(videoConfigPath, defaultVideoConfigPath);
 var fields = file_data.split("\n");
