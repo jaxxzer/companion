@@ -46,6 +46,24 @@ app.use(expressLiquid.middleware);
 // Companion repository root directory
 var _companion_directory = process.env.COMPANION_DIR;
 
+
+function readConfigFile(configFile, defaultFile) {
+	try {
+		var file_data = fs.readFileSync(configFile)
+		return file_data;
+	} catch (err) {
+		logger.warn("error reading configuration file " + configFile, err);
+		logger.warn("copying default configuration file " + defaultFile);
+		child_process.execSync("cp " + defaultFile + " " + configFile);
+		try {
+			var file_data = fs.readFileSync(configFile)
+			return file_data;
+		} catch (err) {
+			logger.error("error loading default configuration file", err);
+		}
+	}
+}
+
 var v4l2camera = require("v4l2camera");
 // This holds all of the cameras/settings detected at start, and that are currently in use, we need to update this every time we modify the camera setttings
 var _cameras = []
@@ -55,52 +73,44 @@ var _cameras = []
 //These settings are passed to the video streaming application, and are used by
 //gstreamer v4l2src element. The v4l2src element needs to call the appropriate ioctls,
 //so we don't do that in this application.
-var _activeFormat
-
-function readConfigFile(configFile, defaultFile) {
-	try {
-		var file_data = fs.readFileSync(configFile)
-	} catch (err) {
-		logger.warn("error loading video format from file", err);
-		logger.warn("copying default video format file");
-		child_process.execSync("cp " + defaultFile + " " + configFile);
-		try {
-			var file_data = fs.readFileSync(configFile)
-			return file_data;
-		} catch (err) {
-			logger.error("error loading default video format file", err);
-		}
-	}
-}
-
-var defaultVideoConfigPath = _companion_directory + "/params/vidformat.param.default";
-var videoConfigPath = home_dir + "/vidformat.param";
-var file_data = readConfigFile(videoConfigPath, defaultVideoConfigPath);
-var fields = file_data.toString().split("\n");
-_activeFormat = { "frameSize": fields[0] + "x" + fields[1], "frameRate": fields[2], "device": fields[3], "format": "H264" }
-
-
-// This holds the user created camera/streaming profiles
-var _profiles = {};
-
-// Load saved user camera/streaming profiles
 try {
-	var file_path = home_dir+"/camera-profiles";
-	_profiles = JSON.parse(fs.readFileSync(file_path).toString());
-	logger.log("loading profiles from file", _profiles);
+	var _activeFormat
+	var videoConfigPath = home_dir + "/vidformat.param";
+	var defaultVideoConfigPath = _companion_directory + "/params/vidformat.param.default";
+	logger.log("loading video format from file " + videoConfigPath);
+	var data = readConfigFile(videoConfigPath, defaultVideoConfigPath);
+	var fields = data.toString().split("\n");
+	_activeFormat = { "frameSize": fields[0] + "x" + fields[1], "frameRate": fields[2], "device": fields[3], "format": "H264" }
 } catch (err) {
-	logger.log("error loading video profiles from file", err);
+	logger.log("error loading video format from file", err);
 }
 
-//This holds all of the last used/known settings from previous run
-var old_cameras = []
-const camera_settings_path = home_dir+"/camera-settings"
+try {
+	// This holds the user created camera/streaming profiles
+	var _profiles = {};
+
+	// Load saved user camera/streaming profiles
+	var cameraProfilesPath = home_dir + "/camera-profiles";
+
+	logger.log("loading camera profiles from file " + cameraProfilesPath);
+
+	var cameraProfileData = readConfigFile(cameraProfilesPath, "/dev/null");
+
+	_profiles = JSON.parse(cameraProfileData.toString());
+} catch (err) {
+	logger.error("error loading camera profiles from file", err);
+}
+
 // Load the last known camera settings
 try {
-	var file_data = fs.readFileSync(camera_settings_path);
-	old_cameras = JSON.parse(file_data.toString());
+	//This holds all of the last used/known settings from previous run
+	var old_cameras = []
+	const cameraSettingsPath = home_dir + "/camera-settings"
+	logger.log("loading camera settings from file " + cameraSettingsPath);
+	var cameraSettingsData = readConfigFile(cameraSettingsPath, "/dev/null");
+	old_cameras = JSON.parse(cameraSettingsData.toString());
 } catch (err) {
-	logger.log("error loading file", err);
+	logger.error("error loading camera settings from file", err);
 }
 
 // Create camera objects, set all camera settings on all cameras to the
