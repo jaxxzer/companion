@@ -95,8 +95,11 @@ try {
 	logger.log("loading camera profiles from file " + cameraProfilesPath);
 
 	var cameraProfileData = readConfigFile(cameraProfilesPath, "/dev/null");
-
-	_profiles = JSON.parse(cameraProfileData.toString());
+	if (cameraProfileData.length > 0) {
+		_profiles = JSON.parse(cameraProfileData.toString());
+	} else {
+		logger.log("camera profiles is empty");
+	}
 } catch (err) {
 	logger.error("error loading camera profiles from file", err);
 }
@@ -108,7 +111,11 @@ try {
 	const cameraSettingsPath = home_dir + "/camera-settings"
 	logger.log("loading camera settings from file " + cameraSettingsPath);
 	var cameraSettingsData = readConfigFile(cameraSettingsPath, "/dev/null");
-	old_cameras = JSON.parse(cameraSettingsData.toString());
+	if (cameraSettingsData.length > 0) {
+		old_cameras = JSON.parse(cameraSettingsData.toString());
+	} else {
+		logger.log("camera settings is empty");
+	}
 } catch (err) {
 	logger.error("error loading camera settings from file", err);
 }
