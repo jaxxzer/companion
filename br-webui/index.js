@@ -76,7 +76,7 @@ function readConfigFile(configFile, defaultFile) {
 var defaultVideoConfigPath = _companion_directory + "/params/vidformat.param.default";
 var videoConfigPath = home_dir + "/vidformat.param";
 var file_data = readConfigFile(videoConfigPath, defaultVideoConfigPath);
-var fields = file_data.split("\n");
+var fields = file_data.toString().split("\n");
 _activeFormat = { "frameSize": fields[0] + "x" + fields[1], "frameRate": fields[2], "device": fields[3], "format": "H264" }
 
 
