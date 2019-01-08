@@ -3,7 +3,7 @@
 GIT_REPO=jaxxzer/companion
 GIT_BRANCH=setup
 
-. bash-helpers.sh
+. ./bash-helpers.sh
 
 COMPANION_DIR=/home/pi/companion
 
