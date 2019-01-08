@@ -74,10 +74,12 @@ run_step cd $COMPANION_DIR
 run_step git submodule update --init --recursive || "error failed submodule update"
 
 run_step cd $COMPANION_DIR/submodules/mavlink/pymavlink
-run_step python3 setup.py build install || "error failed "
+run_step python3 setup.py build || "error failed "
+run_step sudo python3 setup.py install || "error failed "
 
 run_step cd $COMPANION_DIR/submodules/MAVProxy
-run_step python setup.py build install
+run_step python setup.py build
+run_step sudo python setup.py install
 
 run_step cd $COMPANION_DIR/br-webui
 run_step npm install
