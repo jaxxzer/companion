@@ -19,17 +19,25 @@ run_step() {
   echo -e ":) completed RUN STEP $@ with code $?"
 }
 
+skip_step() {
+  echo -e ""
+  echo -e ""
+  echo -e "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  echo -e "SKIP STEP: $@"
+  echo -e "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+}
+
 COMPANION_DIR=/home/pi/companion
 
 # Update package lists and current packages
 export DEBIAN_FRONTEND=noninteractive
 APT_OPTIONS=-yq
-run_step sudo apt update $APT_OPTIONS
-run_step sudo apt upgrade $APT_OPTIONS
+skip_step sudo apt update $APT_OPTIONS
+skip_step sudo apt upgrade $APT_OPTIONS
 
 
 # install python and pip
-run_step sudo apt install $APT_OPTIONS \
+skip_step sudo apt install $APT_OPTIONS \
   rpi-update \
   python-dev \
   python-pip \
@@ -55,31 +63,31 @@ run_step sudo apt install $APT_OPTIONS \
   || error "failed apt install dependencies"
 
 # browser based terminal
-run_step sudo npm install tty.js -g || error "failed npm install dependencies"
+skip_step sudo npm install tty.js -g || error "failed npm install dependencies"
 
-run_step sudo pip install \
+skip_step sudo pip install \
   future \
   pynmea2 \
   grequests \
   bluerobotics-ping \
   || error "failed pip install dependencies"
 
-run_step sudo pip3 install future || error "failed pip3 install dependencies"
+skip_step sudo pip3 install future || error "failed pip3 install dependencies"
 
 # clone bluerobotics companion repository
-run_step git clone --depth 1 -b $GIT_BRANCH https://github.com/$GIT_REPO $COMPANION_DIR || error "failed git clone"
+skip_step git clone --depth 1 -b $GIT_BRANCH https://github.com/$GIT_REPO $COMPANION_DIR || error "failed git clone"
 
-run_step cd $COMPANION_DIR
+skip_step cd $COMPANION_DIR
 
-run_step git submodule update --init --recursive || "error failed submodule update"
+skip_step git submodule update --init --recursive || "error failed submodule update"
 
-run_step cd $COMPANION_DIR/submodules/mavlink/pymavlink
-run_step python3 setup.py build || "error failed "
-run_step sudo python3 setup.py install || "error failed "
+skip_step cd $COMPANION_DIR/submodules/mavlink/pymavlink
+skip_step python3 setup.py build || "error failed "
+skip_step sudo python3 setup.py install || "error failed "
 
-run_step cd $COMPANION_DIR/submodules/MAVProxy
-run_step python setup.py build
-run_step sudo python setup.py install
+skip_step cd $COMPANION_DIR/submodules/MAVProxy
+skip_step python setup.py build
+skip_step sudo python setup.py install
 
 run_step cd $COMPANION_DIR/br-webui
 run_step npm install
