@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
 
-# RPi2 setup script for use as companion computer. This script is simplified for use with
-# the ArduSub code.
-cd $HOME
+COMPANION_DIR=/home/pi/companion
 
 # Update package lists and current packages
 export DEBIAN_FRONTEND=noninteractive
 APT_OPTIONS=-yq
-apt update $APT_OPTIONS
-apt upgrade $APT_OPTIONS
+sudo apt update $APT_OPTIONS
+sudo apt upgrade $APT_OPTIONS
 
 
 # install python and pip
-apt install $APT_OPTIONS \
+sudo apt install $APT_OPTIONS \
   rpi-update \
   python-dev \
   python-pip \
@@ -25,40 +23,45 @@ apt install $APT_OPTIONS \
   screen \
   nodejs \
   npm \
-  gstreamer1.0-[^omx] \
+  gstreamer1.0-tools \
+  gstreamer1.0-plugins-base \
+  gstreamer1.0-plugins-good \
+  gstreamer1.0-plugins-bad \
+  gstreamer1.0-plugins-ugly \
   isc-dhcp-server=4.3.* \
   python3-pip \
-  libv4l-dev
+  libv4l-dev \
+  v4l-utils
 
 # browser based terminal
-npm install tty.js -g
+sudo npm install tty.js -g
 
-pip install \
+sudo pip install \
   future \
   pynmea2 \
   grequests \
   bluerobotics-ping
 
-pip3 install future
+sudo pip3 install future
 
 # clone bluerobotics companion repository
-sudo -u pi git clone https://github.com/bluerobotics/companion.git $HOME/companion
+git clone https://github.com/bluerobotics/companion.git $COMPANION_DIR
 
-cd $HOME/companion
+cd $COMPANION_DIR
 
 git submodule update --init --recursive
 
-cd $HOME/companion/submodules/mavlink/pymavlink
-python3 setup.py build install
+cd $COMPANION_DIR/submodules/mavlink/pymavlink
+sudo python3 setup.py build install
 
-cd $HOME/companion/submodules/MAVProxy
-python setup.py build install
+cd $COMPANION_DIR/submodules/MAVProxy
+sudo python setup.py build install
 
-cd $HOME/companion/br-webui
+cd $COMPANION_DIR/br-webui
 npm install
 
-$HOME/companion/scripts/setup-raspbian.sh
-$HOME/companion/scripts/setup-system-files.sh
+$COMPANION_DIR/scripts/setup-raspbian.sh
+$COMPANION_DIR/scripts/setup-system-files.sh
 
 # run rpi update
 rpi-update

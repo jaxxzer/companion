@@ -7,14 +7,14 @@
 echo "" > /etc/wpa_supplicant/wpa_supplicant.config
 
 #Copy network configuration files from Companion directory to respective configuration directories
-cp /home/pi/companion/params/interfaces-eth0 /etc/network/interfaces.d/
+sudo cp /home/pi/companion/params/interfaces-eth0 /etc/network/interfaces.d/
 
 #Source configuration for dhcp server in the default configuration files
-sed -i '\%/home/pi/companion/%d' /etc/dhcp/dhcpd.conf
-sh -c "echo 'include \"/home/pi/companion/params/dhcpd-server.conf\";' >> /etc/dhcp/dhcpd.conf"
+sudo sed -i '\%/home/pi/companion/%d' /etc/dhcp/dhcpd.conf
+sudo sh -c "echo 'include \"/home/pi/companion/params/dhcpd-server.conf\";' >> /etc/dhcp/dhcpd.conf"
 
-sed -i '\%/home/pi/companion/%d' /etc/default/isc-dhcp-server
-sh -c "echo '. /home/pi/companion/params/isc-dhcp.conf' >> /etc/default/isc-dhcp-server"
+sudo sed -i '\%/home/pi/companion/%d' /etc/default/isc-dhcp-server
+sudo sh -c "echo '. /home/pi/companion/params/isc-dhcp.conf' >> /etc/default/isc-dhcp-server"
 
 #Copy default network configuration to user folder
 cp /home/pi/companion/params/network.conf.default /home/pi/network.conf
@@ -24,5 +24,5 @@ echo "alias stopscreens=\"screen -ls | grep Detached | cut -d. -f1 | awk '{print
 echo 192.168.2.2 > /home/pi/static-ip.conf
 
 # override start timeout for networking service to prevent hang at boot in certain misconfiguraitons
-mkdir -p /etc/systemd/system/networking.service.d
-sh -c "echo '[Service]\nTimeoutStartSec=10' > /etc/systemd/system/networking.service.d/timeout.conf"
+sudo mkdir -p /etc/systemd/system/networking.service.d
+sudo sh -c "echo '[Service]\nTimeoutStartSec=10' > /etc/systemd/system/networking.service.d/timeout.conf"
