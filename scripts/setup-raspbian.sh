@@ -4,6 +4,8 @@
 # /boot/cmdline.txt and
 # /boot/config.txt
 
+. bash-helpers.sh
+
 # Disable camera LED
 run_step sudo sed -i '\%disable_camera_led=1%d' /boot/config.txt
 run_step sudo sed -i '$a disable_camera_led=1' /boot/config.txt
