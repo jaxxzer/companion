@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+GIT_REPO=jaxxzer/companion
 GIT_BRANCH=setup
 
 error() {
@@ -14,7 +15,8 @@ run_step() {
   echo -e "RUN STEP: $@"
   echo -e "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
   "$@" || error "failed RUN STEP $@ with code $?"
-  echo -e "completed RUN STEP $@ with code $?"
+  echo -e ""
+  echo -e ":) completed RUN STEP $@ with code $?"
 }
 
 COMPANION_DIR=/home/pi/companion
@@ -36,6 +38,7 @@ run_step sudo apt install $APT_OPTIONS \
   libcurl4-openssl-dev \
   libxml2-dev \
   libxslt1-dev \
+  libffi-dev \
   git \
   screen \
   nodejs \
@@ -64,7 +67,7 @@ run_step sudo pip install \
 run_step sudo pip3 install future || error "failed pip3 install dependencies"
 
 # clone bluerobotics companion repository
-run_step git clone --depth 1 -b $GIT_BRANCH https://github.com/bluerobotics/companion.git $COMPANION_DIR || error "failed git clone"
+run_step git clone --depth 1 -b $GIT_BRANCH https://github.com/$GIT_REPO $COMPANION_DIR || error "failed git clone"
 
 run_step cd $COMPANION_DIR
 
