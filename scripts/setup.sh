@@ -9,11 +9,11 @@ export COMPANION_DIR=/home/pi/companion
 # Update package lists and current packages
 export DEBIAN_FRONTEND=noninteractive
 APT_OPTIONS=-yq
-run_step sudo apt update $APT_OPTIONS
-run_step sudo apt upgrade $APT_OPTIONS
+skip_step sudo apt update $APT_OPTIONS
+skip_step sudo apt upgrade $APT_OPTIONS
 
 # install python and pip
-run_step sudo apt install $APT_OPTIONS \
+skip_step sudo apt install $APT_OPTIONS \
   rpi-update \
   python-dev \
   python-pip \
@@ -37,10 +37,11 @@ run_step sudo apt install $APT_OPTIONS \
   v4l-utils \
   || error "failed apt install dependencies"
 
-run_step sh -c "wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash"
+skip_step sh -c "wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash"
 
 # to use nvm
-run_step source ~/.profile
+run_step . ~/.profile
+run_step . ~/.bashrc
 
 run_step nvm 11.6.0
 
