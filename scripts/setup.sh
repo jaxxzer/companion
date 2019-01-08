@@ -42,7 +42,7 @@ pip install \
 pip3 install future
 
 # clone bluerobotics companion repository
-git clone https://github.com/bluerobotics/companion.git $HOME/companion
+sudo -u pi git clone https://github.com/bluerobotics/companion.git $HOME/companion
 
 cd $HOME/companion
 
