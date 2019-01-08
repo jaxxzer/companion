@@ -1801,7 +1801,7 @@ io.on('connection', function(socket) {
 	socket.on('get current ip', function() {
 		logger.log("get current ip");
 
-		child_process.exec("ifconfig eth0 | sed -En 's/.*inet ([^ ]*).*/\1/gp'", function (error, stdout, stderr) {
+		child_process.exec("ifconfig eth0 | sed -En 's/.*inet ([^ ]*).*/\\1/gp'", function (error, stdout, stderr) {
 			if(!error) {
 				socket.emit('current ip', stdout);
 			};
