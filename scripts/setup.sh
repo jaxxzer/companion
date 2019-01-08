@@ -37,7 +37,7 @@ skip_step sudo apt install $APT_OPTIONS \
   v4l-utils \
   || error "failed apt install dependencies"
 
-skip_step sh -c "wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash"
+run_step sh -c "wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash"
 
 # to use nvm
 run_step . ~/.profile
