@@ -74,4 +74,4 @@ run_step $COMPANION_DIR/scripts/setup-raspbian.sh
 run_step $COMPANION_DIR/scripts/setup-system-files.sh
 
 # run rpi update
-run_step rpi-update
+run_step sudo rpi-update
