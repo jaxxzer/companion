@@ -3,9 +3,9 @@
 GIT_REPO=jaxxzer/companion
 GIT_BRANCH=setup
 
-. ./bash-helpers.sh
 
-COMPANION_DIR=/home/pi/companion
+export COMPANION_DIR=/home/pi/companion
+. $COMPANION_DIR/scripts/bash-helpers.sh
 
 # Update package lists and current packages
 export DEBIAN_FRONTEND=noninteractive
@@ -67,8 +67,8 @@ skip_step cd $COMPANION_DIR/submodules/MAVProxy
 skip_step python setup.py build
 skip_step sudo python setup.py install
 
-run_step cd $COMPANION_DIR/br-webui
-run_step npm install
+skip_step cd $COMPANION_DIR/br-webui
+skip_step npm install
 
 run_step $COMPANION_DIR/scripts/setup-raspbian.sh
 run_step $COMPANION_DIR/scripts/setup-system-files.sh
