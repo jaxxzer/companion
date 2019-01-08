@@ -1,16 +1,33 @@
 #!/usr/bin/env bash
 
+GIT_BRANCH=setup
+
+error() {
+    echo -e "ERROR: $*" >&2
+    exit 1
+}
+
+run_step() {
+  echo -e ""
+  echo -e ""
+  echo -e "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  echo -e "RUN STEP: $@"
+  echo -e "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  "$@" || error "failed RUN STEP $@ with code $?"
+  echo -e "completed RUN STEP $@ with code $?"
+}
+
 COMPANION_DIR=/home/pi/companion
 
 # Update package lists and current packages
 export DEBIAN_FRONTEND=noninteractive
 APT_OPTIONS=-yq
-sudo apt update $APT_OPTIONS
-sudo apt upgrade $APT_OPTIONS
+run_step sudo apt update $APT_OPTIONS
+run_step sudo apt upgrade $APT_OPTIONS
 
 
 # install python and pip
-sudo apt install $APT_OPTIONS \
+run_step sudo apt install $APT_OPTIONS \
   rpi-update \
   python-dev \
   python-pip \
@@ -31,37 +48,39 @@ sudo apt install $APT_OPTIONS \
   isc-dhcp-server=4.3.* \
   python3-pip \
   libv4l-dev \
-  v4l-utils
+  v4l-utils \
+  || error "failed apt install dependencies"
 
 # browser based terminal
-sudo npm install tty.js -g
+run_step sudo npm install tty.js -g || error "failed npm install dependencies"
 
-sudo pip install \
+run_step sudo pip install \
   future \
   pynmea2 \
   grequests \
-  bluerobotics-ping
+  bluerobotics-ping \
+  || error "failed pip install dependencies"
 
-sudo pip3 install future
+run_step sudo pip3 install future || error "failed pip3 install dependencies"
 
 # clone bluerobotics companion repository
-git clone https://github.com/bluerobotics/companion.git $COMPANION_DIR
+run_step git clone --depth 1 -b $GIT_BRANCH https://github.com/bluerobotics/companion.git $COMPANION_DIR || error "failed git clone"
 
-cd $COMPANION_DIR
+run_step cd $COMPANION_DIR
 
-git submodule update --init --recursive
+run_step git submodule update --init --recursive || "error failed submodule update"
 
-cd $COMPANION_DIR/submodules/mavlink/pymavlink
-sudo python3 setup.py build install
+run_step cd $COMPANION_DIR/submodules/mavlink/pymavlink
+run_step sudo python3 setup.py build install || "error failed "
 
-cd $COMPANION_DIR/submodules/MAVProxy
-sudo python setup.py build install
+run_step cd $COMPANION_DIR/submodules/MAVProxy
+run_step sudo python setup.py build install
 
-cd $COMPANION_DIR/br-webui
-npm install
+run_step cd $COMPANION_DIR/br-webui
+run_step npm install
 
-$COMPANION_DIR/scripts/setup-raspbian.sh
-$COMPANION_DIR/scripts/setup-system-files.sh
+run_step $COMPANION_DIR/scripts/setup-raspbian.sh
+run_step $COMPANION_DIR/scripts/setup-system-files.sh
 
 # run rpi update
-rpi-update
+run_step rpi-update
