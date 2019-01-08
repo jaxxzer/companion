@@ -3,7 +3,7 @@
 # setup raspbian / raspberry pi configuration files
 # /boot/cmdline.txt and
 # /boot/config.txt
-. ./bash-helpers.sh
+. $COMPANION_DIR/scripts/bash-helpers.sh
 
 run_step echo "" > /etc/wpa_supplicant/wpa_supplicant.config
 
