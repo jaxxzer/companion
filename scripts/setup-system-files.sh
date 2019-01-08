@@ -21,7 +21,7 @@ run_step sudo sh -c "echo '. /home/pi/companion/params/isc-dhcp.conf' >> /etc/de
 run_step cp /home/pi/companion/params/network.conf.default /home/pi/network.conf
 
 
-run_step echo "alias stopscreens=\"screen -ls | grep Detached | cut -d. -f1 | awk '{print \$1}' | xargs kill\"" >> ~/.bash_aliases
+run_step "echo \"alias stopscreens=\"screen -ls | grep Detached | cut -d. -f1 | awk '{print \$1}' | xargs kill\"\" >> ~/.bash_aliases"
 run_step echo 192.168.2.2 > /home/pi/static-ip.conf
 
 # override start timeout for networking service to prevent hang at boot in certain misconfiguraitons
