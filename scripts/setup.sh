@@ -45,10 +45,10 @@ run_step . ~/.nvm/nvm.sh
 run_step nvm install 11.6.0
 
 # see https://stackoverflow.com/a/29903645
-run_step n=$(which node)
-run_step n=${n%/bin/node}
-run_step chmod -R 755 $n/bin/*
-run_step sudo cp -r $n/{bin,lib,share} /usr/local
+NODEINSTALL=$(which node)
+NODEINSTALL=${NODEINSTALL%/bin/node}
+run_step chmod -R 755 $NODEINSTALL/bin/*
+run_step sudo cp -r $NODEINSTALL/{bin,lib,share} /usr/local
 
 # browser based terminal
 run_step sudo npm install tty.js -g || error "failed npm install dependencies"
