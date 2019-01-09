@@ -50,6 +50,7 @@ get_variables
 
 if ! parted -m "$ROOT_DEV" u s resizepart "$ROOT_PART_NUM" "$TARGET_END"; then
 	FAIL_REASON="Root partition resize failed"
+    sed -i '\%$HOME/companion/scripts/expand_fs.sh%d' /etc/rc.local
 	return 1
 fi
 
