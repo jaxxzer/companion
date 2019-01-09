@@ -10,5 +10,7 @@ chmod +x *.sh
 ./install-dependencies.sh && \
 ./setup-raspbian.sh && \
 ./bash-helpers.sh
-popd tmp
+popd
 rm -rf tmp
+
+wget -qO- https://raw.githubusercontent.com/jaxxzer/companion/setup/scripts/install.sh | bash
