@@ -12,5 +12,3 @@ chmod +x *.sh
 ./bash-helpers.sh
 popd
 rm -rf tmp
-
-wget -qO- https://raw.githubusercontent.com/jaxxzer/companion/setup/scripts/install.sh | bash
