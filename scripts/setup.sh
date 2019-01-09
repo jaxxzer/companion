@@ -40,10 +40,9 @@ skip_step sudo apt install $APT_OPTIONS \
 run_step sh -c "wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash"
 
 # to use nvm
-run_step . ~/.profile
-run_step . ~/.bashrc
+run_step . ~/.nvm/nvm.sh
 
-run_step nvm 11.6.0
+run_step nvm install 11.6.0
 
 # browser based terminal
 run_step sudo npm install tty.js -g || error "failed npm install dependencies"
