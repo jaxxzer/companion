@@ -45,9 +45,10 @@ run_step . ~/.nvm/nvm.sh
 run_step nvm install 11.6.0
 
 # see https://stackoverflow.com/a/29903645
-NODEINSTALL=$(which node)
-NODEINSTALL=${NODEINSTALL%/bin/node}
-run_step chmod -R 755 $NODEINSTALL/bin/*
+run_step NODEINSTALL=$(which node)
+run_step NODEINSTALL=${NODEINSTALL%/bin/node}
+# had to use 777 instead of 755 so 'sudo npm install -g' will work
+run_step chmod -R 777 $NODEINSTALL/bin/*
 run_step sudo cp -r $NODEINSTALL/{bin,lib,share} /usr/local
 
 # browser based terminal
