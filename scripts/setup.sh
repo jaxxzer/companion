@@ -9,11 +9,11 @@ export COMPANION_DIR=/home/pi/companion
 # Update package lists and current packages
 export DEBIAN_FRONTEND=noninteractive
 APT_OPTIONS=-yq
-skip_step sudo apt update $APT_OPTIONS
-skip_step sudo apt upgrade $APT_OPTIONS
+run_step sudo apt update $APT_OPTIONS
+run_step sudo apt upgrade $APT_OPTIONS
 
 # install python and pip
-skip_step sudo apt install $APT_OPTIONS \
+run_step sudo apt install $APT_OPTIONS \
   rpi-update \
   python-dev \
   python-pip \
