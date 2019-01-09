@@ -26,6 +26,7 @@ run_step sudo apt install $APT_OPTIONS \
   git \
   screen \
   npm \
+  nodejs \
   gstreamer1.0-tools \
   gstreamer1.0-plugins-base \
   gstreamer1.0-plugins-good \
@@ -36,20 +37,6 @@ run_step sudo apt install $APT_OPTIONS \
   libv4l-dev \
   v4l-utils \
   || error "failed apt install dependencies"
-
-run_step sh -c "wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash"
-
-# to use nvm
-run_step . ~/.nvm/nvm.sh
-
-run_step nvm install 11.6.0
-
-# see https://stackoverflow.com/a/29903645
-run_step export NODEINSTALL=$(which node)
-run_step export NODEINSTALL=${NODEINSTALL%/bin/node}
-# had to use 777 instead of 755 so 'sudo npm install -g' will work
-run_step chmod -R 777 $NODEINSTALL/{bin,lib,share}/*
-run_step sudo cp -r $NODEINSTALL/{bin,lib,share} /usr/local
 
 # browser based terminal
 run_step sudo npm install tty.js -g || error "failed npm install dependencies"
