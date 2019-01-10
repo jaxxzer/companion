@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export COMPANION_DIR=/home/pi/companion
+
 GIT_USER=jaxxzer
 GIT_BRANCH=setup
 BASE_URL=https://raw.githubusercontent.com/$GIT_USER/companion/$GIT_BRANCH/scripts

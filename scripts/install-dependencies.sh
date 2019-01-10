@@ -3,7 +3,6 @@
 GIT_REPO=jaxxzer/companion
 GIT_BRANCH=setup
 
-export COMPANION_DIR=/home/pi/companion
 . ./bash-helpers.sh
 
 # Update package lists and current packages
