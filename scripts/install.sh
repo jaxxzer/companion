@@ -4,10 +4,10 @@ GIT_USER=jaxxzer
 GIT_BRANCH=setup
 BASE_URL=https://raw.githubusercontent.com/$GIT_USER/companion/$GIT_BRANCH/scripts
 
-mkdir tmp || echo "failed to make temporary directory" >&2; exit 1
+mkdir tmp || { echo "failed to make temporary directory" >&2 && exit 1; }
 pushd tmp
 
-wget $BASE_URL/bash-helpers.sh || echo "failed to download $BASE_URL/bash-helpers.sh" >&2; exit 1
+wget $BASE_URL/bash-helpers.sh || { echo "failed to download $BASE_URL/bash-helpers.sh" >&2 && exit 1; }
 
 # source helpers
 . ./bash-helpers.sh
