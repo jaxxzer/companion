@@ -54,6 +54,9 @@ run_step sudo pip3 install future || error "failed pip3 install dependencies"
 run_step bash -c "git clone --depth 1 -b $GIT_BRANCH https://github.com/$GIT_REPO $COMPANION_DIR \
   || { git --git-dir $COMPANION_DIR/.git fetch && git --git-dir $COMPANION_DIR/.git checkout origin/$GIT_BRANCH; }"
 
+# get tags for version information
+run_step git --git-dir $COMPANION_DIR/.git fetch --tags
+
 run_step cd $COMPANION_DIR
 
 run_step git submodule update --init --recursive || "error failed submodule update"
