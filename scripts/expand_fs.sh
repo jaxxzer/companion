@@ -53,4 +53,4 @@ fi
 
 resize2fs -p $ROOT_PART_DEV
 
-sed -i '\%/home/pi/companion/scripts/expand_fs.sh%d' /etc/rc.local
+sed -i '\%/home/.*/companion/scripts/expand_fs.sh%d' /etc/rc.local

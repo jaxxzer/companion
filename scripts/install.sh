@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export COMPANION_DIR=/home/pi/companion
+export COMPANION_DIR=$HOME/companion
 
 GIT_USER=jaxxzer
 GIT_BRANCH=setup

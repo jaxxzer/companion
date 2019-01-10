@@ -25,3 +25,6 @@ run_step sudo sed -i '/enable_uart=/d' /boot/config.txt
 
 # append 'enable_uart=1' line to /boot/config.txt
 run_step echo "enable_uart=1" | sudo tee -a /boot/config.txt
+
+# run rpi update
+run_step sudo rpi-update

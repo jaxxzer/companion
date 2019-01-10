@@ -13,7 +13,6 @@ run_step sudo apt upgrade $APT_OPTIONS
 
 # install python and pip
 run_step sudo apt install $APT_OPTIONS \
-  rpi-update \
   python-dev \
   python-pip \
   python-libxml2 \
@@ -72,8 +71,9 @@ run_step cd $COMPANION_DIR/br-webui
 run_step export JOBS=4
 run_step npm install
 
-run_step $COMPANION_DIR/scripts/setup-raspbian.sh
 run_step $COMPANION_DIR/scripts/setup-system-files.sh
 
-# run rpi update
-run_step sudo rpi-update
+if grep -q 'Hardware.*: BCM2' /proc/cpuinfo; then
+  run_step sudo apt install $APT_OPTIONS rpi-update
+  run_step $COMPANION_DIR/scripts/setup-raspbian.sh
+fi
