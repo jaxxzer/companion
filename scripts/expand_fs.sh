@@ -30,8 +30,6 @@ get_variables () {
 
   OLD_DISKID=$(fdisk -l "$ROOT_DEV" | sed -n 's/Disk identifier: 0x\([^ ]*\)/\1/p')
 
-  check_noobs
-
   ROOT_DEV_SIZE=$(cat "/sys/block/${ROOT_DEV_NAME}/size")
   TARGET_END=$((ROOT_DEV_SIZE - 1))
 
