@@ -51,7 +51,9 @@ run_step sudo pip install \
 run_step sudo pip3 install future || error "failed pip3 install dependencies"
 
 # clone bluerobotics companion repository
-run_step git clone --depth 1 -b $GIT_BRANCH https://github.com/$GIT_REPO $COMPANION_DIR || error "failed git clone"
+run_step git clone --depth 1 -b $GIT_BRANCH https://github.com/$GIT_REPO $COMPANION_DIR \
+  || { git --git-dir $COMPANION_DIR/.git fetch && git --git-dir $COMPANION_DIR/.git checkout $GIT_BRANCH } \
+  || error "failed to get git right"
 
 run_step cd $COMPANION_DIR
 
