@@ -22,6 +22,9 @@ run_step chmod +x *.sh
 # install dependencies from apt, pip etc
 run_step ./install-dependencies.sh
 
+run_step pwd
+run_step ls
+
 # setup raspbian/raspberry-pi specific files
 run_step ./setup-raspbian.sh
 
