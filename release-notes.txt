@@ -93,3 +93,15 @@ Initial release
 - Bugfix: permissions on update script logging
 - Bugfix: factory default parameter reset was broken
 - Bugfix: "undefined" appearing next to wifi status on /network page
+
+0.0.17:
+
+- add support for using Water Linked underwater GPS system with QGC v3.5.0 (nmea out to port 14401)
+- use 'fast.com' for internet status in order to support more regions (ex china)
+- add support for newer ardupilot firmwares (update usb device identifiers)
+- stash before hard reset during companion update process
+- update bluerobotics-ping python library to version 0.0.7
+- update 'factory default' ardusub firmware to stable v3.5.4
+- update download link for development firmware (.apj)
+- updates to ping1d_mavlink_driver.py
+- bugfix camera settings are not saved/loaded correctly
