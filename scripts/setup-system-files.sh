@@ -27,17 +27,13 @@ run_step echo 192.168.2.2 > $HOME/static-ip.conf
 run_step sudo mkdir -p /etc/systemd/system/networking.service.d
 run_step sudo sh -c "echo '[Service]\nTimeoutStartSec=10' > /etc/systemd/system/networking.service.d/timeout.conf"
 
-# setup directive to expand the filesystem on next boot (this line will delte itself after running once)
-S1="$COMPANION_DIR/scripts/expand_fs.sh"
-
 # source startup script
-S2=". $COMPANION_DIR/.companion.rc"
+S1=". $COMPANION_DIR/.companion.rc"
 
 # this will produce desired result if this script has been run already,
 # and commands are already in place
 # delete S1 if it already exists
 # insert S1 above the first uncommented exit 0 line in the file
 run_step sudo sed -i -e "\%$S1%d" \
--e "\%$S2%d" \
--e "0,/^[^#]*exit 0/s%%$S1\n$S2\n&%" \
+-e "0,/^[^#]*exit 0/s%%$S1\n&%" \
 /etc/rc.local

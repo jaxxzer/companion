@@ -30,14 +30,17 @@ run_step sudo apt install $APT_OPTIONS \
   gstreamer1.0-plugins-good \
   gstreamer1.0-plugins-bad \
   gstreamer1.0-plugins-ugly \
-  isc-dhcp-server=4.3.* \
+  isc-dhcp-server \
   python3-pip \
   libv4l-dev \
   v4l-utils \
+  krb5-dev \
   || error "failed apt install dependencies"
 
+sudo npm install npm@latest -g
+
 # browser based terminal
-run_step sudo npm install tty.js -g || error "failed npm install dependencies"
+#run_step sudo npm install tty.js -g || error "failed npm install dependencies"
 
 run_step sudo pip install \
   future \
