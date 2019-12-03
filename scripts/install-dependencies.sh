@@ -34,7 +34,7 @@ run_step sudo apt install $APT_OPTIONS \
   python3-pip \
   libv4l-dev \
   v4l-utils \
-  krb5-dev \
+  libkrb5-dev \
   || error "failed apt install dependencies"
 
 sudo npm install npm@latest -g
