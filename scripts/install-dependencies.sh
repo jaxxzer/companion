@@ -37,7 +37,7 @@ run_step sudo apt install $APT_OPTIONS \
   libkrb5-dev \
   || error "failed apt install dependencies"
 
-sudo npm install npm@latest -g
+run_step sudo npm install npm@latest -g
 
 # browser based terminal
 #run_step sudo npm install tty.js -g || error "failed npm install dependencies"
