@@ -37,9 +37,10 @@ if [ $? != 0 ]; then
         fi
     done
 fi
-
-# load gstreamer options
-gstOptions=$(tr '\n' ' ' < $HOME/gstreamer2.param)
+run_step pwd
+run_step ls
+# load gstreamer options, use default if user config does not work
+gstOptions=$(tr '\n' ' ' < $HOME/gstreamer2.param || tr '\n' ' ' < $HOME/companion/params/gstreamer2.param.default)
 
 # make sure framesize and framerate are supported
 
@@ -58,4 +59,3 @@ else
     # if we make it this far, it means the gst pipeline failed, so load the backup settings
     cp ~/vidformat.param.bak ~/vidformat.param && rm ~/vidformat.param.bak
 fi
-
