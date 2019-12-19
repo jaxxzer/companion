@@ -43,14 +43,14 @@ run_step sudo npm install npm@latest -g
 # browser based terminal
 #run_step sudo npm install tty.js -g || error "failed npm install dependencies"
 
-run_step sudo pip install \
+run_step pip install --user \
   future \
   pynmea2 \
   grequests \
   bluerobotics-ping \
   || error "failed pip install dependencies"
 
-run_step sudo pip3 install future || error "failed pip3 install dependencies"
+run_step pip3 install --user future || error "failed pip3 install dependencies"
 
 # todo adjust so this can be run when the directory already exists
 # clone bluerobotics companion repository
