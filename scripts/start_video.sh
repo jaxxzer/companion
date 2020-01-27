@@ -38,8 +38,8 @@ if [ $? != 0 ]; then
     done
 fi
 
-# load gstreamer options
-gstOptions=$(tr '\n' ' ' < $HOME/gstreamer2.param)
+# load gstreamer options, use default if user config does not work
+gstOptions=$(tr '\n' ' ' < $HOME/gstreamer2.param || tr '\n' ' ' < $HOME/companion/params/gstreamer2.param.default)
 
 # make sure framesize and framerate are supported
 
