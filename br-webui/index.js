@@ -562,8 +562,8 @@ function emitRemotes() {
 	_refs = { 'remotes' : {} };
 	
 	updateCurrentHEAD(companionRepository);
-	
-	companionRepository.getRemotes()
+
+	companionRepository.getRemoteNames()
 		.then(formatRemotes)
 		.catch(function(err) { logger.log(err); });
 }
