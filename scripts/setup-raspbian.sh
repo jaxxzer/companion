@@ -40,3 +40,7 @@ done
 for STRING in "dtparam=i2c_arm=on" "dtparam=spi=on" "dtoverlay=spi1-3cs" "dtoverlay=uart1"; do
     run_step sudo sh -c "echo $STRING >> /boot/config.txt"
 done
+
+# allow wifi (country code should already be set in /etc/wpa_supplicant/wpa_supplicant.conf)
+run_step sudo rfkill unblock all
+run_step sudo wpa_cli -i wlan0 reconfigure
