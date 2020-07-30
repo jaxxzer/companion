@@ -1,7 +1,7 @@
 #!/usr/bin/env python -u
 
 """Scan serial ports for ping devices
-    Symlinks to detected devices are created under /dev/serial/ping/
+    Symlinks to detected devices are created under SERIAL_DIR/
     This script needs root permission to create the symlinks
 """
 from __future__ import print_function
@@ -10,24 +10,21 @@ from brping import PingDevice
 from brping.definitions import *
 import serial
 import time
+from tic import TicSerial
+
+SERIAL_DIR = "~/serial"
 
 class PingEnumerator:
 
-    def legacy_detect_ping1d(self, ping):
-        """
-        Detects Ping1D devices without DEVICE_INFORMATION implemented
-        """
-        firmware_version = ping.request(PING1D_FIRMWARE_VERSION)
-        if firmware_version is None:
+    def detect_tic(self, dev):
+        tic = TicSerial("/dev/serial/by-id/" + dev)
+        
+        v = tic.getVinVoltage()
+        if v is None:
             return None
-        description = "/dev/serial/ping/Ping1D-id-%s-t-%s-m-%s-v-%s.%s" % (
-            firmware_version.src_device_id,
-            firmware_version.device_type,
-            firmware_version.device_model,
-            firmware_version.firmware_version_major,
-            firmware_version.firmware_version_minor
-        )
-        return description
+        elif v > 0 and v < 65000:
+            return "~/serial/tic"
+        return None
 
     def detect_device(self, dev):
         """
@@ -37,7 +34,8 @@ class PingEnumerator:
         """
 
         try:
-            ping = PingDevice("/dev/serial/by-id/" + dev, 115200)
+            ping = PingDevice()
+            ping.connect_serial("/dev/serial/by-id/" + dev, 115200)
         except Exception as exception:
             print("An exception has occurred: ", exception)
             return None
@@ -47,31 +45,13 @@ class PingEnumerator:
 
         device_info = ping.request(COMMON_DEVICE_INFORMATION)
         if not device_info:
-            return self.legacy_detect_ping1d(ping)
-
-        if device_info.device_type == 1:
-            description = "/dev/serial/ping/Ping1D-id-%s-r-%s-v-%s.%s.%s"
-        elif device_info.device_type == 2:
-            description = "/dev/serial/ping/Ping360-id-%s-r-%s-v-%s.%s.%s"
-            # Open device with 2M baud to setup Ping360
-            print("Setting baud to 2M...")
-            ser = serial.Serial("/dev/serial/by-id/" + dev, 2000000)
-            ser.send_break()
-            ser.write("UUUUUUU".encode())
-            ser.close()
-            self.set_low_latency(dev)
-
-        else:
             return None
 
-        return description % (
-            device_info.src_device_id,
-            device_info.device_revision,
-            device_info.firmware_version_major,
-            device_info.firmware_version_minor,
-            device_info.firmware_version_patch
-        )
-
+        if device_info.device_type == 20:
+            return "~/serial/beamplot-rx"
+        elif device_info.device_type == 21:
+            return "~/serial/beamplot-tx"
+    
     def set_low_latency(self, dev):
         """
         Receives /dev/serial/by-id/...
@@ -99,7 +79,7 @@ class PingEnumerator:
             target_device = target_device.decode().split('\n')[0]
 
             # Create another link to it
-            subprocess.check_output(' '.join(["mkdir", "-p", "/dev/serial/ping"]), shell=True)
+            subprocess.check_output(' '.join(["mkdir", "-p", SERIAL_DIR]), shell=True)
             subprocess.check_output("ln -fs %s %s" % (
                 target_device,
                 target), shell=True)
@@ -112,10 +92,10 @@ class PingEnumerator:
 
     def erase_old_symlinks(self):
         """
-        Erases all symlinks at "/dev/serial/ping/"
+        Erases all symlinks at "SERIAL_DIR/"
         """
         try:
-            subprocess.check_output(["rm", "-rf", "/dev/serial/ping"])
+            subprocess.check_output(["rm", "-rf", SERIAL_DIR])
         except subprocess.CalledProcessError as exception:
             print(exception)
 
@@ -132,16 +112,15 @@ class PingEnumerator:
             print(exception)
             return []
 
-
-
-
 if __name__ == '__main__':
     enumerator = PingEnumerator()
     enumerator.erase_old_symlinks()
-
+    link = None
     # Look at each serial device, probe for ping
     for dev in enumerator.list_serial_devices():
-        link = enumerator.detect_device(dev)
+        link = enumerator.detect_tic(dev)
+        if link is None:
+            link = enumerator.detect_device(dev)
         if link:
             enumerator.make_symlink(dev, link)
         else:
