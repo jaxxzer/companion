@@ -16,6 +16,7 @@ run_step sudo apt upgrade $APT_OPTIONS
 run_step sudo apt install $APT_OPTIONS \
   python-dev \
   python-pip \
+  python3-pip \
   python-libxml2 \
   python-lxml \
   libcurl4-openssl-dev \
@@ -79,4 +80,5 @@ run_step cd $COMPANION_DIR/br-webui
 run_step export JOBS=4
 run_step npm install
 
+run_step sudo python3 $HOME/companion/services/network/setup.py install
 cd $ORIGINAL_DIR
