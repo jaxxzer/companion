@@ -2,6 +2,7 @@
 --load-module='GPSInput,DepthOutput'
 --source-system=200
 --cmd="set heartbeat 0"
+--cmd="param forceload ~/companion/params/serial0.param"
 --out udpin:localhost:9000
 --out udpout:localhost:9002
 --out udpin:0.0.0.0:14660
