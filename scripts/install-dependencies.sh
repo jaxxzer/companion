@@ -33,7 +33,6 @@ run_step sudo apt install $APT_OPTIONS \
   gstreamer1.0-plugins-bad \
   gstreamer1.0-plugins-ugly \
   isc-dhcp-server \
-  python3-pip \
   libv4l-dev \
   v4l-utils \
   libkrb5-dev \
@@ -53,7 +52,10 @@ run_step sudo pip install \
   bluerobotics-ping \
   || error "failed pip install dependencies"
 
-run_step sudo pip3 install future || error "failed pip3 install dependencies"
+run_step sudo pip3 install \
+  future \
+  bluerobotics-ping \
+  || error "failed pip3 install dependencies"
 
 # todo adjust so this can be run when the directory already exists
 # clone bluerobotics companion repository
