@@ -117,7 +117,6 @@ function enableInternetUpdates(enabled) {
 function enableUpdates(enabled) {
 	enableInternetUpdates(enabled);
 	document.getElementById('pixhawkFileButton').disabled = !enabled;
-	document.getElementById('companionFileButton').disabled = !enabled;
 }
 
 function showCompanionSpinner(show) {
@@ -509,11 +508,6 @@ socket.on('cpu stats', function(data) {
 				<div>
 					<h4 id="companionAvailable">Download Update: No Updates Available</h4>
 					<button id="companionButton" type="button" class="btn btn-primary" onclick="updateCompanion()" style="display:none" disabled=true>Update</button>
-				</div>
-				<div>
-					<h4>Upload Zipped Update:</h4>
-					<input id="companionFileButton" type="submit" class="btn btn-primary" value="Upload" onClick="submit(updateCompanion, companionProgress, 'companionFile')" style="display:table-cell"/>
-					<input type="file" id="companionFile" style="display:table-cell;" />
 				</div>
 			</div>
 		</div>
