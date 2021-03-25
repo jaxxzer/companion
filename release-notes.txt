@@ -160,3 +160,13 @@ Initial release
     - fmuv2 has 1M flash limitation and some features disabled
 - Bugfix do not attempt filesystem resize on every boot
     - filesystem is expaneded once on first boot
+
+0.0.25:
+- Update default ArduSub firmware to 4.0.2
+- Update factory default parameters
+
+0.0.26:
+- Ping1D mavlink driver will automatically set autopilot RNGFND1_TYPE parameter to 'Mavlink'
+- Update default ArduSub firmware to 4.0.3
+- Remove unsupported 'upload companion update' option from the webui
+- Replace old px_uploader.py with new uploader.py for flashing autopilot firmware
