@@ -58,40 +58,58 @@ mkdir -p $MOUNT_LOCATION
 DEV_PART2=$DEV_DISK
 DEV_PART2+=2
 
+DEV_PART1=$DEV_DISK
+DEV_PART1+=1
+
 echo "unmounting $DEV_DISK"
 umount $DEV_DISK?*
 
-echo "mounting $DEV_DISK on $MOUNT_LOCATION"
-mount $DEV_PART2 $MOUNT_LOCATION || error "Failed to mount $DEV_PART2 on $MOUNT_LOCATION"
+echo "mounting $DEV_PART1 on $MOUNT_LOCATION"
+mount $DEV_PART1 $MOUNT_LOCATION || error "Failed to mount $DEV_PART1 on $MOUNT_LOCATION"
 
-COMPANION_HOME=$MOUNT_LOCATION
-COMPANION_HOME+=/home/pi
+# COMPANION_HOME=$MOUNT_LOCATION
+# COMPANION_HOME+=/home/pi
 
 # remove any backup repo
-echo "removing backup repo"
-rm -rf $COMPANION_HOME/.companion || error "failed to remove backup repo"
+# echo "removing backup repo"
+# rm -rf $COMPANION_HOME/.companion || error "failed to remove backup repo"
 
 # keep log files for future debug
 #rm -rf $COMPANION_HOME/.webui.log
 #rm -rf $COMPANION_HOME/.update_log
 
 # set default service parameters
-echo "copying gstreamer2.param.default"
-cp ../../params/gstreamer2.param.default $COMPANION_HOME/gstreamer2.param || error "failed to copy gstreamer2.param.default"
-echo "copying mavproxy.param.default"
-cp ../../params/mavproxy.param.default $COMPANION_HOME/mavproxy.param || error "failed to copy mavproxy.param.default"
+# echo "copying gstreamer2.param.default"
+# cp ../../params/gstreamer2.param.default $COMPANION_HOME/gstreamer2.param || error "failed to copy gstreamer2.param.default"
+# echo "copying mavproxy.param.default"
+# cp ../../params/mavproxy.param.default $COMPANION_HOME/mavproxy.param || error "failed to copy mavproxy.param.default"
 
 # remove any wifi information
-echo "copying wpa_suplicant.conf.default"
-cp ../../params/wpa_supplicant.conf.default $MOUNT_LOCATION/etc/wpa_supplicant/wpa_supplicant.conf || error "failed to copy default wpa_supplicant.conf"
+# echo "copying wpa_suplicant.conf.default"
+# cp ../../params/wpa_supplicant.conf.default $MOUNT_LOCATION/etc/wpa_supplicant/wpa_supplicant.conf || error "failed to copy default wpa_supplicant.conf"
 
 # insert expand_fs command in /etc/rc.local
 # above the line to start the companion services
-echo "adding expand_fs entry to /etc/rc.local"
-EXPAND="/home/pi/companion/scripts/expand_fs.sh"
-sed -i "\%$EXPAND%d" $MOUNT_LOCATION/etc/rc.local || error "sed failed to remove expand_fs entry in /etc/rc.local"
-sed -i "\%^. /home/pi/companion/.companion.rc%i$EXPAND" $MOUNT_LOCATION/etc/rc.local || error "sed failed to add expand_fs entry in /etc/rc.local"
+# echo "adding expand_fs entry to /etc/rc.local"
 
+EXPAND=" quiet init=/usr/lib/raspi-config/init_resize.sh"
+sed -i "1s%$%$EXPAND%" $MOUNT_LOCATION/cmdline.txt || error "sed failed to add expand_fs entry in /etc/rc.local"
+
+# sed -i "\%$EXPAND%d" $MOUNT_LOCATION/etc/rc.local || error "sed failed to remove expand_fs entry in /etc/rc.local"
+# sed -i "\%^. /home/pi/companion/.companion.rc%i$EXPAND" $MOUNT_LOCATION/etc/rc.local || error "sed failed to add expand_fs entry in /etc/rc.local"
+# echo $MOUNT_LOCATION/boot/cmdline.txt
+# ls $MOUNT_LOCATION
+
+
+# cp cmdline.txt $MOUNT_LOCATION/ || error "failed to copy cmdline.txt"
+umount $MOUNT_LOCATION
+
+echo "mounting $DEV_PART2 on $MOUNT_LOCATION"
+mount $DEV_PART2 $MOUNT_LOCATION || error "Failed to mount $DEV_PART2 on $MOUNT_LOCATION"
+
+cp resize2fs_once $MOUNT_LOCATION/etc/init.d/ || error "failed to copy resize2fs_once"
+chmod +x $MOUNT_LOCATION/etc/init.d/resize2fs_once
+ln -s $MOUNT_LOCATION/etc/init.d/resize2fs_once $MOUNT_LOCATION/etc/rc3.d/S01resize2fs_once
 umount $MOUNT_LOCATION
 
 # check filesystem
